@@ -61,7 +61,7 @@ curl -fsSL "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main
 Windows PowerShell:
 
 ```powershell
-& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main/scripts/install.ps1")))
+& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/shanthoshss/chatwave-with-claude/main/scripts/install.ps1")))
 ```
 
 When prompted, choose at least one coding agent and optionally enable [RTK](https://github.com/rtk-ai/rtk) + [Headroom](https://github.com/headroomlabs-ai/headroom) token optimization for supported agents.
