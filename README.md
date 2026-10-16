@@ -90,7 +90,7 @@ terminal open.
 
 <a id="nvidia-nim-provider"></a>
 
-### 3. Configure NVIDIA NIM
+### 3. DO NOT CONFING NVIDIA IF YOUR ARE USING CHATWAVE
 
 1. Create an API key at [build.nvidia.com/settings/api-keys](https://build.nvidia.com/settings/api-keys).
 2. Open the Admin UI URL from the server log.
