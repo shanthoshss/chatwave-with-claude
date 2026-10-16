@@ -110,6 +110,18 @@ def test_openai_api_key_card_is_independent_of_chatgpt_connection() -> None:
     )
 
 
+def test_chatwave_is_available_in_admin_provider_configuration() -> None:
+    status = _provider_status("chatwave", {"CHATWAVE_API_KEY": _value(None)})
+
+    assert status["display_name"] == "ChatWave"
+    assert status["website_url"] == "https://chat.thewave.cv/"
+    assert status["logo_filename"] == "chatwave.svg"
+    assert status["kind"] == "remote"
+    assert status["status"] == "missing_key"
+    assert status["configuration_keys"] == ["CHATWAVE_API_KEY"]
+    assert status["settings_keys"] == ["CHATWAVE_API_KEY", "CHATWAVE_PROXY"]
+
+
 def test_every_catalog_configuration_attribute_has_an_admin_field() -> None:
     for descriptor in PROVIDER_CATALOG.values():
         for settings_attr in descriptor.configuration_attrs():
