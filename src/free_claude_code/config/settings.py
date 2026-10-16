@@ -223,6 +223,9 @@ class Settings(BaseModel):
     # ==================== LLM7.io (OpenAI-compatible) ====================
     llm7_api_keys: ApiKeyList = Field(default=(), validation_alias="LLM7_API_KEY")
 
+    # ==================== ChatWave (OpenAI-compatible) ====================
+    chatwave_api_keys: ApiKeyList = Field(default=(), validation_alias="CHATWAVE_API_KEY")
+
     # ==================== Lightning AI (OpenAI-compatible) ====================
     lightning_api_keys: ApiKeyList = Field(
         default=(), validation_alias="LIGHTNING_API_KEY"
@@ -546,6 +549,9 @@ class Settings(BaseModel):
     )
     llm7_proxy: OptionalNonEmptyString = Field(
         default=None, validation_alias="LLM7_PROXY"
+    )
+    chatwave_proxy: OptionalNonEmptyString = Field(
+        default=None, validation_alias="CHATWAVE_PROXY"
     )
     lightning_proxy: OptionalNonEmptyString = Field(
         default=None, validation_alias="LIGHTNING_PROXY"

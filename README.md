@@ -245,6 +245,7 @@ For another API endpoint, open **Providers → Custom providers → Add provider
 | [NaraRoute](https://router.bynara.id/) | `NARAROUTE_API_KEY` | `nararoute/kimi-k3-free` |
 | [Poolside AI](https://platform.poolside.ai/) | `POOLSIDE_API_KEY` | `poolside/poolside/laguna-s-2.1` |
 | [LLM7.io](https://dash.llm7.io/) | `LLM7_API_KEY` | `llm7/default` |
+| [ChatWave](https://chat.thewave.cv/) | `CHATWAVE_API_KEY` | `chatwave/claude-sonnet-5` |
 | [Scaleway](https://console.scaleway.com/iam/api-keys) | `SCW_SECRET_KEY` | `scaleway/deepseek/deepseek-v4-flash` |
 | [Lightning AI](https://lightning.ai/) | `LIGHTNING_API_KEY` | `lightning/lightning-ai/Qwen3.8-27B` |
 | [Experiential Labs](https://platform.experientiallabs.ai/) | `EXPLABS_API_KEY` | `experiential/union-alpha` |

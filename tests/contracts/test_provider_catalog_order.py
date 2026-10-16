@@ -55,6 +55,7 @@ _EXPECTED_PROVIDER_ORDER: tuple[str, ...] = (
     "nararoute",
     "poolside",
     "llm7",
+    "chatwave",
     "scaleway",
     "lightning",
     "experiential",

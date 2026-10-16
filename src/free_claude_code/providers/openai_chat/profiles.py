@@ -695,6 +695,21 @@ OPENAI_CHAT_PROFILES: dict[str, OpenAIChatProfile] = {
             context_window_tokens_path=("context_window", "tokens"),
         ),
     ),
+    "chatwave": OpenAIChatProfile(
+        _policy("CHATWAVE", ReasoningReplayMode.DISABLED),
+        NO_REASONING,
+        model_listing=OpenAIModelListing(
+            additional_model_ids=(
+                "claude-opus-5-5",
+                "claude-opus-5",
+                "claude-opus-4-8",
+                "claude-sonnet-5-5",
+                "claude-sonnet-5",
+                "claude-fable-5-1",
+                "claude-fable-5",
+            ),
+        ),
+    ),
     "lightning": OpenAIChatProfile(
         _policy(
             "LIGHTNING",

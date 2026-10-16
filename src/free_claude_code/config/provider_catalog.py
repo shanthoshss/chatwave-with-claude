@@ -83,6 +83,7 @@ NARAROUTE_DEFAULT_BASE = "https://router.bynara.id/v1"
 POOLSIDE_DEFAULT_BASE = "https://inference.poolside.ai/v1"
 # LLM7.io OpenAI-compatible Chat Completions API.
 LLM7_DEFAULT_BASE = "https://api.llm7.io/v1"
+CHATWAVE_DEFAULT_BASE = "https://chat.thewave.cv/v1"
 # Lightning AI Model APIs OpenAI-compatible Chat Completions gateway.
 LIGHTNING_DEFAULT_BASE = "https://lightning.ai/api/v1"
 # Experiential Labs OpenAI-compatible Chat Completions gateway.
@@ -689,6 +690,17 @@ PROVIDER_CATALOG: dict[str, ProviderDescriptor] = {
         credential_attr="llm7_api_keys",
         default_base_url=LLM7_DEFAULT_BASE,
         proxy_attr="llm7_proxy",
+    ),
+    "chatwave": ProviderDescriptor(
+        provider_id="chatwave",
+        display_name="ChatWave",
+        website_url="https://chat.thewave.cv/",
+        logo_filename="chatwave.svg",
+        credential_env="CHATWAVE_API_KEY",
+        credential_url="https://chat.thewave.cv/",
+        credential_attr="chatwave_api_keys",
+        default_base_url=CHATWAVE_DEFAULT_BASE,
+        proxy_attr="chatwave_proxy",
     ),
     "scaleway": ProviderDescriptor(
         provider_id="scaleway",

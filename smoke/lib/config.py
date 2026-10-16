@@ -96,6 +96,7 @@ PROVIDER_SMOKE_DEFAULT_MODELS: dict[str, str] = {
     "nararoute": "nararoute/kimi-k3-free",
     "poolside": "poolside/poolside/laguna-s-2.1",
     "llm7": "llm7/default",
+    "chatwave": "chatwave/claude-sonnet-5",
     "lightning": "lightning/lightning-ai/Qwen3.8-27B",
     "experiential": "experiential/union-alpha",
     "cheaperinference": "cheaperinference/gpt-5.4-mini",

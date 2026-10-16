@@ -245,6 +245,23 @@ def test_llm7_is_not_enabled_without_explicit_credential(monkeypatch) -> None:
     assert config.provider_smoke_models() == []
 
 
+def test_chatwave_provider_configuration_uses_supplied_model_id(monkeypatch) -> None:
+    monkeypatch.delenv("FCC_SMOKE_MODEL_CHATWAVE", raising=False)
+    config = _smoke_config(
+        settings=_settings(
+            model="ollama/llama3.1",
+            ollama_base_url="",
+            chatwave_api_keys="chatwave-key",
+        )
+    )
+
+    assert config.has_provider_configuration("chatwave")
+    models = config.provider_smoke_models()
+    assert [model.provider for model in models] == ["chatwave"]
+    assert models[0].full_model == "chatwave/claude-sonnet-5"
+    assert models[0].source == "provider_default"
+
+
 def test_lightning_provider_configuration_uses_documented_default_model(
     monkeypatch,
 ) -> None:
