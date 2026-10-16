@@ -38,7 +38,7 @@ def test_real_disconnect_failure_keeps_retry_after_reload(
                 ),
             )
         elif status_failure == "startup":
-            marker = tmp_path / ".fcc/claude-desktop-disconnect.json"
+            marker = tmp_path / ".cwc/claude-desktop-disconnect.json"
             failed = {"state": "failed", "message": "Startup check failed"}
 
             def failed_update(route):
@@ -78,7 +78,7 @@ def test_real_disconnect_failure_keeps_retry_after_reload(
     expect(dialog).not_to_be_visible()
     expect(opener).to_have_text("Connect")
     assert not profile.exists()
-    assert not (tmp_path / ".fcc/claude-desktop-disconnect.json").exists()
+    assert not (tmp_path / ".cwc/claude-desktop-disconnect.json").exists()
 
 
 def test_desktop_connect_disconnect_and_retry(page, admin_base_url, tmp_path):

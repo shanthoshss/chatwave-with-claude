@@ -14,7 +14,7 @@ def test_bearer_auth_is_the_only_supported_header_shape(
 ) -> None:
     token = "fcc-smoke-token"
     home = tmp_path / "home"
-    env_file = home / ".fcc" / ".env"
+    env_file = home / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(
         "FCC_CONFIG_SCHEMA=1\n"

@@ -74,7 +74,7 @@ def test_admin_retains_code_without_chat_markup():
 def test_admin_retirement_preview_apply_and_runtime_agree(monkeypatch, tmp_path):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(
         "FCC_CONFIG_SCHEMA=1\nMODEL=groq/default\nMODEL_OPUS=groq/managed\n"
@@ -751,7 +751,7 @@ def test_admin_config_masks_secrets_and_exposes_manifest(monkeypatch, tmp_path):
     assert telegram_proxy_field["value"] is None
     assert telegram_proxy_field["configured"] is False
     assert telegram_proxy_field["nullable"] is True
-    assert body["paths"] == {"managed": str(tmp_path / ".fcc" / ".env")}
+    assert body["paths"] == {"managed": str(tmp_path / ".cwc" / ".env")}
     catalog_smoke_keys = {
         f"FCC_SMOKE_MODEL_{provider_id.upper()}" for provider_id in PROVIDER_CATALOG
     }
@@ -937,7 +937,7 @@ def test_admin_model_refresh_reports_partial_provider_failures():
 def test_admin_config_preserves_managed_env_source_contract(monkeypatch, tmp_path):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text("MODEL=open_router/managed-model\n", encoding="utf-8")
     app = create_test_app()
@@ -972,7 +972,7 @@ def test_admin_apply_persists_open_browser_for_next_launch(monkeypatch, tmp_path
         "admin_url": None,
         "fields": [],
     }
-    managed_env = tmp_path / ".fcc" / ".env"
+    managed_env = tmp_path / ".cwc" / ".env"
     assert "FCC_OPEN_BROWSER=false" in managed_env.read_text(encoding="utf-8")
 
 
@@ -996,7 +996,7 @@ def test_admin_apply_hot_publishes_provider_progress_timeout(monkeypatch, tmp_pa
         provider_manager_for_app(app).current_settings().provider_progress_timeout
         == 900.0
     )
-    managed_env = tmp_path / ".fcc" / ".env"
+    managed_env = tmp_path / ".cwc" / ".env"
     assert "PROVIDER_PROGRESS_TIMEOUT=900" in managed_env.read_text(encoding="utf-8")
 
 
@@ -1020,7 +1020,7 @@ def test_admin_apply_hot_publishes_ordered_model_fallbacks(monkeypatch, tmp_path
         ModelFallback(model="open_router/vendor/model-a"),
         ModelFallback(model="groq/vendor/model-b"),
     )
-    managed_env = tmp_path / ".fcc" / ".env"
+    managed_env = tmp_path / ".cwc" / ".env"
     assert (
         decode_model_fallbacks(dotenv_values_from_file(managed_env)["MODEL_FALLBACKS"])
         == provider_manager_for_app(app).current_settings().model_fallbacks
@@ -1038,7 +1038,7 @@ def test_admin_apply_hot_publishes_ordered_model_fallbacks(monkeypatch, tmp_path
 def test_admin_apply_null_removes_model_fallbacks(monkeypatch, tmp_path):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(
         "FCC_CONFIG_SCHEMA=1\nMODEL_FALLBACKS=open_router/vendor/model-a\n",
@@ -1077,7 +1077,7 @@ def test_admin_rejects_invalid_provider_progress_timeout_without_writing(
     assert body["applied"] is False
     assert body["valid"] is False
     assert any("PROVIDER_PROGRESS_TIMEOUT" in error for error in body["errors"])
-    managed_env = tmp_path / ".fcc" / ".env"
+    managed_env = tmp_path / ".cwc" / ".env"
     assert "PROVIDER_PROGRESS_TIMEOUT=" not in managed_env.read_text(encoding="utf-8")
 
 
@@ -1098,7 +1098,7 @@ def test_admin_apply_masks_telegram_proxy_credentials(monkeypatch, tmp_path):
     assert body["applied"] is True
     assert "TELEGRAM_PROXY_URL=********" in body["env_preview"]
     assert proxy_url not in body["env_preview"]
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     text = env_file.read_text(encoding="utf-8")
     assert f"TELEGRAM_PROXY_URL={proxy_url}" in text
 
@@ -1106,7 +1106,7 @@ def test_admin_apply_masks_telegram_proxy_credentials(monkeypatch, tmp_path):
 def test_admin_apply_null_removes_optional_secret(monkeypatch, tmp_path):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(
         "FCC_CONFIG_SCHEMA=1\nTELEGRAM_PROXY_URL=https://secret.invalid\n",
@@ -1133,7 +1133,7 @@ def test_admin_apply_masked_or_blank_secret_is_unchanged(
 ):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(
         "FCC_CONFIG_SCHEMA=1\nOPENROUTER_API_KEY=original-secret\n",
@@ -1283,7 +1283,7 @@ def test_admin_apply_rejects_invalid_provider_proxy_without_side_effects(
 ):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text("MODEL=open_router/test-model\n", encoding="utf-8")
     callbacks: list[str] = []
@@ -1319,7 +1319,7 @@ def test_admin_apply_validates_retained_proxy_and_allows_removal(
 ):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     invalid_proxy = "invalid://proxy.example:8080"
     original = f"GROQ_PROXY={invalid_proxy}\n"
@@ -1357,7 +1357,7 @@ def test_admin_apply_preserves_valid_stored_proxy_secret(
 ):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(
         "OPENAI_PROXY=http://user:password@127.0.0.1:8080\n",
@@ -1400,7 +1400,7 @@ def test_admin_apply_writes_complete_managed_env_and_masks_preview(
     body = response.json()
     assert body["applied"] is True
     assert "OPENROUTER_API_KEY=********" in body["env_preview"]
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     text = env_file.read_text("utf-8")
     assert "MODEL=open_router/test-model" in text
     assert json.loads(dotenv_values_from_text(text)["OPENROUTER_API_KEY"]) == [
@@ -1438,7 +1438,7 @@ def test_admin_apply_writes_fireworks_key_and_masks_preview(monkeypatch, tmp_pat
     body = response.json()
     assert body["applied"] is True
     assert "FIREWORKS_API_KEY=********" in body["env_preview"]
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     text = env_file.read_text(encoding="utf-8")
     assert "MODEL=fireworks/test-model" in text
     assert json.loads(dotenv_values_from_text(text)["FIREWORKS_API_KEY"]) == [
@@ -1466,7 +1466,7 @@ def test_admin_apply_writes_gemini_key_and_masks_preview(monkeypatch, tmp_path):
     body = response.json()
     assert body["applied"] is True
     assert "GEMINI_API_KEY=********" in body["env_preview"]
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     text = env_file.read_text(encoding="utf-8")
     assert "MODEL=gemini/models/gemini-3.1-flash-lite" in text
     assert json.loads(dotenv_values_from_text(text)["GEMINI_API_KEY"]) == ["gm-secret"]
@@ -1492,7 +1492,7 @@ def test_admin_apply_writes_groq_key_and_masks_preview(monkeypatch, tmp_path):
     body = response.json()
     assert body["applied"] is True
     assert "GROQ_API_KEY=********" in body["env_preview"]
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     text = env_file.read_text(encoding="utf-8")
     assert "MODEL=groq/llama-3.3-70b-versatile" in text
     assert json.loads(dotenv_values_from_text(text)["GROQ_API_KEY"]) == ["gq-secret"]
@@ -1518,7 +1518,7 @@ def test_admin_apply_writes_sambanova_key_and_masks_preview(monkeypatch, tmp_pat
     body = response.json()
     assert body["applied"] is True
     assert "SAMBANOVA_API_KEY=********" in body["env_preview"]
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     text = env_file.read_text(encoding="utf-8")
     assert "MODEL=sambanova/Meta-Llama-3.3-70B-Instruct" in text
     assert json.loads(dotenv_values_from_text(text)["SAMBANOVA_API_KEY"]) == [
@@ -1546,7 +1546,7 @@ def test_admin_apply_writes_cerebras_key_and_masks_preview(monkeypatch, tmp_path
     body = response.json()
     assert body["applied"] is True
     assert "CEREBRAS_API_KEY=********" in body["env_preview"]
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     text = env_file.read_text(encoding="utf-8")
     assert "MODEL=cerebras/llama3.1-8b" in text
     assert json.loads(dotenv_values_from_text(text)["CEREBRAS_API_KEY"]) == [
@@ -1575,7 +1575,7 @@ def test_admin_apply_writes_bedrock_region_config_and_masks_key(monkeypatch, tmp
     body = response.json()
     assert body["applied"] is True
     assert "AWS_BEARER_TOKEN_BEDROCK=********" in body["env_preview"]
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     text = env_file.read_text(encoding="utf-8")
     assert "MODEL=bedrock/openai.gpt-oss-120b" in text
     assert json.loads(dotenv_values_from_text(text)["AWS_BEARER_TOKEN_BEDROCK"]) == [
@@ -1606,7 +1606,7 @@ def test_admin_apply_writes_cloudflare_fields_and_masks_preview(monkeypatch, tmp
     assert body["applied"] is True
     assert "CLOUDFLARE_API_TOKEN=********" in body["env_preview"]
     assert "CLOUDFLARE_ACCOUNT_ID=cf-account" in body["env_preview"]
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     text = env_file.read_text(encoding="utf-8")
     assert "MODEL=cloudflare/@cf/moonshotai/kimi-k2.6" in text
     assert json.loads(dotenv_values_from_text(text)["CLOUDFLARE_API_TOKEN"]) == [
@@ -1636,7 +1636,7 @@ def test_admin_apply_writes_huggingface_key_and_masks_preview(monkeypatch, tmp_p
     assert body["applied"] is True
     assert body["pending_fields"] == ["HUGGINGFACE_API_KEY"]
     assert "HUGGINGFACE_API_KEY=********" in body["env_preview"]
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     text = env_file.read_text(encoding="utf-8")
     assert "MODEL=huggingface/openai/gpt-oss-120b:fastest" in text
     assert json.loads(dotenv_values_from_text(text)["HUGGINGFACE_API_KEY"]) == [
@@ -1659,7 +1659,7 @@ def test_admin_key_change_requires_restart_for_active_voice_backend(
 ):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(
         "\n".join(
@@ -1714,7 +1714,7 @@ def test_admin_constructor_captured_setting_requires_restart(
 ):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(f"{key}={initial}\n", encoding="utf-8")
     app = create_test_app()
@@ -1757,7 +1757,7 @@ def test_admin_apply_writes_cohere_key_and_masks_preview(monkeypatch, tmp_path):
     body = response.json()
     assert body["applied"] is True
     assert "COHERE_API_KEY=********" in body["env_preview"]
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     text = env_file.read_text(encoding="utf-8")
     assert "MODEL=cohere/command-a-plus-05-2026" in text
     assert json.loads(dotenv_values_from_text(text)["COHERE_API_KEY"]) == [
@@ -1787,7 +1787,7 @@ def test_admin_apply_replaces_retired_model_and_ignores_retired_credential(
     body = response.json()
     assert body["applied"] is True
     assert "GITHUB_MODELS_TOKEN" not in body["env_preview"]
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     text = env_file.read_text(encoding="utf-8")
     assert "MODEL=" not in text
     assert "GITHUB_MODELS_TOKEN" not in text
@@ -1798,7 +1798,7 @@ def test_admin_apply_preserves_hidden_diagnostics_and_smoke_values(
 ):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(
         "\n".join(
@@ -1831,7 +1831,7 @@ def test_admin_apply_preserves_hidden_diagnostics_and_smoke_values(
 def test_admin_apply_preserves_unrecognized_managed_zai_base_url(monkeypatch, tmp_path):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(
         "\n".join(
@@ -1863,7 +1863,7 @@ def test_admin_apply_preserves_unrecognized_managed_zai_base_url(monkeypatch, tm
 def test_admin_apply_preserves_unrecognized_managed_assignments(monkeypatch, tmp_path):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(
         "\n".join(
@@ -1996,7 +1996,7 @@ def test_restart_signal_failure_reports_saved_config_and_manual_restart(
         "admin_url": None,
         "fields": ["PORT"],
     }
-    assert "PORT=9090" in (tmp_path / ".fcc" / ".env").read_text()
+    assert "PORT=9090" in (tmp_path / ".cwc" / ".env").read_text()
     status = client.get("/admin/api/status").json()
     assert status["port"] == original_port
     assert status["pending_fields"] == ["PORT"]
@@ -2093,7 +2093,7 @@ def test_admin_process_env_values_are_locked_and_not_written(monkeypatch, tmp_pa
     )
 
     assert response.status_code == 200
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     assert "deepseek/managed-model" not in env_file.read_text("utf-8")
 
 
@@ -2117,7 +2117,7 @@ def test_admin_process_model_fallbacks_are_locked_and_not_written(
     )
 
     assert response.status_code == 200
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     assert "MODEL_FALLBACKS=" not in env_file.read_text("utf-8")
 
 
@@ -2143,7 +2143,7 @@ def test_admin_never_reads_arbitrary_current_directory_env(monkeypatch, tmp_path
     )
 
     assert response.status_code == 200
-    managed_text = (tmp_path / ".fcc" / ".env").read_text("utf-8")
+    managed_text = (tmp_path / ".cwc" / ".env").read_text("utf-8")
     assert "MODEL=deepseek/deepseek-chat" not in managed_text
     assert "DEEPSEEK_API_KEY=deepseek-secret" not in managed_text
 
@@ -2151,7 +2151,7 @@ def test_admin_never_reads_arbitrary_current_directory_env(monkeypatch, tmp_path
 def test_admin_migration_removes_blank_required_managed_values(monkeypatch, tmp_path):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(
         "MESSAGING_PLATFORM=\nWHISPER_DEVICE=\n",
@@ -2167,7 +2167,7 @@ def test_admin_migration_removes_blank_required_managed_values(monkeypatch, tmp_
 
     assert response.status_code == 200
     assert response.json()["applied"] is True
-    managed_text = (tmp_path / ".fcc" / ".env").read_text("utf-8")
+    managed_text = (tmp_path / ".cwc" / ".env").read_text("utf-8")
     assert json.loads(dotenv_values_from_text(managed_text)["NVIDIA_NIM_API_KEY"]) == [
         "nim-secret"
     ]
@@ -2180,7 +2180,7 @@ def test_admin_migrates_empty_auth_token_to_explicit_disabled_state(
 ):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(
         "ANTHROPIC_AUTH_TOKEN=\nPROVIDER_RATE_LIMIT=1\n",
@@ -2218,7 +2218,7 @@ def test_admin_apply_rejects_missing_required_value_without_writing(
 ):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)
-    env_file = tmp_path / ".fcc" / ".env"
+    env_file = tmp_path / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     original = "ANTHROPIC_AUTH_TOKEN=\nMESSAGING_PLATFORM=none\n"
     env_file.write_text(original, encoding="utf-8")
@@ -2258,7 +2258,7 @@ def test_admin_apply_preserves_false_and_numeric_zero(monkeypatch, tmp_path):
 
     assert response.status_code == 200
     assert response.json()["applied"] is True
-    managed = (tmp_path / ".fcc" / ".env").read_text(encoding="utf-8")
+    managed = (tmp_path / ".cwc" / ".env").read_text(encoding="utf-8")
     assert "FCC_OPEN_BROWSER=false" in managed
     assert "HTTP_WRITE_TIMEOUT=0" in managed
 

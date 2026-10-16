@@ -3,7 +3,7 @@
 <h1>
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="assets/free-claude-code-wordmark-light.svg">
-    <img src="assets/free-claude-code-wordmark-dark.svg" alt="Free Claude Code" width="610">
+    <img src="assets/free-claude-code-wordmark-dark.svg" alt="Chatwave With Claude" width="610">
   </picture>
 </h1>
 
@@ -14,7 +14,6 @@
 [![Type Checker: Ty](https://img.shields.io/badge/Type%20Checker-ty-fdd835.svg?style=for-the-badge)](https://pypi.org/project/ty/)
 [![Formatter: Ruff](https://img.shields.io/badge/Formatter-ruff-bf4b00.svg?style=for-the-badge)](https://github.com/astral-sh/ruff)
 [![Logging: Loguru](https://img.shields.io/badge/logging-loguru-00695c.svg?style=for-the-badge)](https://github.com/Delgan/loguru)
-
 [Quick Start](#quick-start) · [Providers](#choose-a-provider) · [Clients](#connect-your-client) · [Integrations](#optional-integrations) · [Manage](#manage-your-installation)
 
 </div>
@@ -23,8 +22,8 @@
   <em>Independent open-source project. Not affiliated with or endorsed by Anthropic. Claude and Claude Code are trademarks of Anthropic.</em>
 </p>
 
-## What You Get
-
+## What You Get (for fcc only)
+NOTE: YOU NEED CHATWAVE API 
 - **61 ToS-friendly providers. 1.3B+ free tokens every month.** Use free, paid, subscription, and local models from one searchable UI without putting your account at risk. FCC follows provider terms and removes integrations if they stop being allowed.
 - **11 coding agents. One model catalog.** Run [Claude Code](https://code.claude.com/docs/en/overview), [Codex](https://github.com/openai/codex), [Pi](https://github.com/earendil-works/pi), [OpenCode](https://github.com/anomalyco/opencode), [Cline](https://github.com/cline/cline), [Hermes](https://github.com/NousResearch/hermes-agent), [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness), [Grok Build](https://github.com/xai-org/grok-build), [Muse Code](https://research.meta.ai/blog/introducing-muse-code-and-muse-spark-1-2/), [Aider](https://aider.chat/), or [VS Code Chat](https://code.visualstudio.com/) with your FCC models.
 - **Keep coding through provider outages.** After retries are exhausted, FCC automatically tries your next configured model without making you restart the turn. This works across every client.
@@ -46,19 +45,20 @@ Free-tier availability and limits are controlled by each provider and may change
   <p><em>A native Codex session in FCC's browser UI.</em></p>
 </div>
 
-## Quick Start
+## Quick Start THIS IS A FORK OF FREE CLAUDE CODE REPO - https;//github.com/Alishahryar1/free-claude-code/ EVERYTHING IN CAPS IS FOR CWC
+THIS IS A FORK OF FREE CLAUDE CODE REPO - https;//github.com/Alishahryar1/free-claude-code/ EVERYTHING IN CAPS IS FOR CWC
 
 <a id="install"></a>
 
 ### 1. Install
 
-macOS/Linux:
+macOS/Linux: (not supported for CWC)
 
 ```bash
 curl -fsSL "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main/scripts/install.sh" | sh
 ```
 
-Windows PowerShell:
+Windows PowerShell: (SUPPORTED)
 
 ```powershell
 & ([scriptblock]::Create((irm "https://raw.githubusercontent.com/shanthoshss/chatwave-with-claude/main/scripts/install.ps1")))
@@ -66,11 +66,11 @@ Windows PowerShell:
 
 When prompted, choose at least one coding agent and optionally enable [RTK](https://github.com/rtk-ai/rtk) + [Headroom](https://github.com/headroomlabs-ai/headroom) token optimization for supported agents.
 
-### 2. Start FCC
+### 2. Start CWC
 
 #### Windows
 
-Open **Free Claude Code** from your desktop or Start menu.
+Open **Chatwave Config** from your desktop or Start menu.
 
 #### macOS
 
@@ -90,7 +90,11 @@ terminal open.
 
 <a id="nvidia-nim-provider"></a>
 
+<<<<<<< HEAD
+### 3. Configure NVIDIA NIM (DO NOT IF U ARE CONNECTING CHATWAVE)
+=======
 ### 3. DO NOT CONFING NVIDIA IF YOUR ARE USING CHATWAVE
+>>>>>>> 8f3a9b22b80427ef167155988b1c9aad10b52ae2
 
 1. Create an API key at [build.nvidia.com/settings/api-keys](https://build.nvidia.com/settings/api-keys).
 2. Open the Admin UI URL from the server log.
@@ -105,66 +109,66 @@ in Admin.
   <img src="assets/admin-page.png" alt="Free Claude Code Admin UI" width="700">
 </div>
 
-### 4. Run Your Coding Agent
+### 4. Run Your Coding Agent (REPLACE "FCC" TO "cwc")
 
 Claude Code:
 
 ```bash
-fcc-claude
+cwc-claude
 ```
 
 Codex:
 
 ```bash
-fcc-codex
+cwc-codex
 ```
 
 Pi:
 
 ```bash
-fcc-pi
+cwc-pi
 ```
 
 OpenCode 2:
 
 ```bash
-fcc-opencode
+cwc-opencode
 ```
 
 Cline:
 
 ```bash
-fcc-cline
+cwc-cline
 ```
 
 Hermes:
 
 ```bash
-fcc-hermes
+cwc-hermes
 ```
 
 DeepSeek Harness Web:
 
 ```bash
-fcc-dsh
+cwc-dsh
 ```
 
 Grok Build:
 
 ```bash
-fcc-grok
+cwc-grok
 ```
 
 Muse Code:
 
 ```bash
-fcc-muse
+cwc-muse
 ```
 
 Aider:
 
 ```bash
-fcc-aider
+cwc-aider
 ```
 
 <a id="model-picker"></a>
@@ -508,7 +512,7 @@ Stop every running FCC command before uninstalling.
 **Removes**
 
 - Free Claude Code, including its desktop launcher and commands
-- `~/.fcc/`
+- `~/.cwc/` and legacy `~/.fcc/` data
 
 **Keeps**
 

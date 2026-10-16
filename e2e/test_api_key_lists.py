@@ -45,7 +45,7 @@ def test_keyboard_reorder_replace_remove_and_reopen_preserve_saved_keys(
     dialog.get_by_role("button", name="Save", exact=True).click()
     expect(dialog).not_to_be_visible()
     keys = json.loads(
-        dotenv_values_from_file(tmp_path / ".fcc/.env")["NVIDIA_NIM_API_KEY"]
+        dotenv_values_from_file(tmp_path / ".cwc/.env")["NVIDIA_NIM_API_KEY"]
     )
     assert keys == ["third-secret", "replacement-secret"]
     page.reload()
@@ -55,7 +55,7 @@ def test_keyboard_reorder_replace_remove_and_reopen_preserve_saved_keys(
     dialog.get_by_role("button", name="Remove Key 1", exact=True).click()
     dialog.get_by_role("button", name="Save", exact=True).click()
     expect(dialog).not_to_be_visible()
-    assert "NVIDIA_NIM_API_KEY" not in dotenv_values_from_file(tmp_path / ".fcc/.env")
+    assert "NVIDIA_NIM_API_KEY" not in dotenv_values_from_file(tmp_path / ".cwc/.env")
 
 
 def test_adding_row_finishes_move_before_next_keyboard_cancel(
@@ -84,7 +84,7 @@ def test_adding_row_finishes_move_before_next_keyboard_cancel(
     dialog.get_by_role("button", name="Save", exact=True).click()
     expect(dialog).not_to_be_visible()
     assert json.loads(
-        dotenv_values_from_file(tmp_path / ".fcc/.env")["NVIDIA_NIM_API_KEY"]
+        dotenv_values_from_file(tmp_path / ".cwc/.env")["NVIDIA_NIM_API_KEY"]
     ) == ["draft-second", "draft-first", "draft-third"]
     dialog = open_provider(page, "nvidia_nim")
     expect(dialog.locator(".api-key-row")).to_have_count(3)
@@ -117,7 +117,7 @@ def test_actual_drag_reorders_without_exposing_saved_values(
     dialog.get_by_role("button", name="Save", exact=True).click()
     expect(dialog).not_to_be_visible()
     assert json.loads(
-        dotenv_values_from_file(tmp_path / ".fcc/.env")["NVIDIA_NIM_API_KEY"]
+        dotenv_values_from_file(tmp_path / ".cwc/.env")["NVIDIA_NIM_API_KEY"]
     ) == ["drag-second", "drag-third", "drag-first"]
 
 
@@ -249,7 +249,7 @@ def test_either_shared_provider_edits_the_same_ordered_list(
     page.keyboard.press("Space")
     dialog.get_by_role("button", name="Save", exact=True).click()
     expect(dialog).not_to_be_visible()
-    assert json.loads(dotenv_values_from_file(tmp_path / ".fcc/.env")[key]) == [
+    assert json.loads(dotenv_values_from_file(tmp_path / ".cwc/.env")[key]) == [
         "shared-second",
         "shared-first",
     ]
@@ -270,7 +270,7 @@ def test_long_list_scrolls_and_escape_cancels_only_the_keyboard_move(
     assert (
         len(
             json.loads(
-                dotenv_values_from_file(tmp_path / ".fcc/.env")["NVIDIA_NIM_API_KEY"]
+                dotenv_values_from_file(tmp_path / ".cwc/.env")["NVIDIA_NIM_API_KEY"]
             )
         )
         == 33
@@ -325,7 +325,7 @@ def test_custom_warning_save_and_rename_retain_masked_rows(
     expect(page.locator("#saveProvider")).to_be_disabled()
     expect(dialog).to_have_attribute("open", "")
     definitions = json.loads(
-        dotenv_values_from_file(tmp_path / ".fcc/.env")["FCC_CUSTOM_PROVIDERS"]
+        dotenv_values_from_file(tmp_path / ".cwc/.env")["FCC_CUSTOM_PROVIDERS"]
     )
     assert definitions[0]["display_name"] == "Renamed gateway"
     assert definitions[0]["api_keys"] == ["custom-first", "custom-second"]

@@ -69,6 +69,16 @@ $FccCommands = @(
     "fcc-grok",
     "fcc-muse",
     "fcc-aider",
+    "cwc-claude",
+    "cwc-codex",
+    "cwc-pi",
+    "cwc-opencode",
+    "cwc-cline",
+    "cwc-hermes",
+    "cwc-dsh",
+    "cwc-grok",
+    "cwc-muse",
+    "cwc-aider",
     "fcc-doctor",
     "fcc-update",
     "fcc-init",
@@ -116,7 +126,7 @@ function Write-InstallLog {
 function Initialize-InstallLog {
     if ($DryRun) { return }
     try {
-        $directory = Join-Path $env:USERPROFILE ".fcc\logs"
+        $directory = Join-Path $env:USERPROFILE ".cwc\logs"
         [void] [IO.Directory]::CreateDirectory($directory)
         $script:InstallLog = Join-Path $directory ("install-$(Get-Date -Format yyyyMMdd-HHmmss)-$([guid]::NewGuid().ToString('N')).log")
         Write-InstallLog "Starting Free Claude Code installer"
@@ -309,16 +319,16 @@ function Read-CodingAgentSelection {
 
 function Select-CodingAgents {
     while ($true) {
-        $script:InstallClaudeCode = Read-CodingAgentSelection claude "Claude Code" fcc-claude
-        $script:InstallCodex = Read-CodingAgentSelection codex Codex fcc-codex
-        $script:InstallPi = Read-CodingAgentSelection pi Pi fcc-pi
-        $script:InstallOpenCode = Read-CodingAgentSelection opencode OpenCode fcc-opencode
-        $script:InstallCline = Read-CodingAgentSelection cline "Cline CLI" fcc-cline
-        $script:InstallHermes = Read-CodingAgentSelection hermes "Hermes Agent" fcc-hermes
-        $script:InstallDsh = Read-CodingAgentSelection dsh "DeepSeek Harness" fcc-dsh
-        $script:InstallGrok = Read-CodingAgentSelection grok "Grok Build" fcc-grok
-        $script:InstallMuse = Read-CodingAgentSelection muse "Muse Code" fcc-muse
-        $script:InstallAider = Read-CodingAgentSelection aider Aider fcc-aider
+        $script:InstallClaudeCode = Read-CodingAgentSelection claude "Claude Code" cwc-claude
+        $script:InstallCodex = Read-CodingAgentSelection codex Codex cwc-codex
+        $script:InstallPi = Read-CodingAgentSelection pi Pi cwc-pi
+        $script:InstallOpenCode = Read-CodingAgentSelection opencode OpenCode cwc-opencode
+        $script:InstallCline = Read-CodingAgentSelection cline "Cline CLI" cwc-cline
+        $script:InstallHermes = Read-CodingAgentSelection hermes "Hermes Agent" cwc-hermes
+        $script:InstallDsh = Read-CodingAgentSelection dsh "DeepSeek Harness" cwc-dsh
+        $script:InstallGrok = Read-CodingAgentSelection grok "Grok Build" cwc-grok
+        $script:InstallMuse = Read-CodingAgentSelection muse "Muse Code" cwc-muse
+        $script:InstallAider = Read-CodingAgentSelection aider Aider cwc-aider
 
         if ($script:InstallClaudeCode -or $script:InstallCodex -or $script:InstallPi -or $script:InstallOpenCode -or $script:InstallCline -or $script:InstallHermes -or $script:InstallDsh -or $script:InstallGrok -or $script:InstallMuse -or $script:InstallAider) {
             break
@@ -1732,11 +1742,11 @@ function Export-FccDesktopIcon {
 
 function Configure-AndConfirmFreeClaudeCode {
     Start-InstallStep "PATH configuration"
-    $iconPath = Join-Path $env:USERPROFILE ".fcc\app-icon.ico"
+    $iconPath = Join-Path $env:USERPROFILE ".cwc\app-icon.ico"
     if ($DryRun) {
         Write-Host "+ uv tool update-shell"
         Write-Host "+ uv tool dir --bin"
-        Write-Host "+ verify fcc-desktop, fcc-server, fcc-claude, fcc-codex, fcc-pi, fcc-opencode, fcc-cline, fcc-hermes, fcc-dsh, fcc-grok, fcc-muse, and fcc-aider in the uv tool bin directory"
+        Write-Host "+ verify fcc-desktop, fcc-server, cwc-claude, cwc-codex, cwc-pi, cwc-opencode, cwc-cline, cwc-hermes, cwc-dsh, cwc-grok, cwc-muse, and cwc-aider in the uv tool bin directory"
         Write-Host "+ fcc-server --version"
         Export-FccDesktopIcon `
             -DesktopCommand "<uv-tool-bin>\fcc-desktop.exe" `
@@ -1759,7 +1769,7 @@ function Configure-AndConfirmFreeClaudeCode {
         [IO.Path]::AltDirectorySeparatorChar
     )
     $installedCommands = @{}
-    foreach ($commandName in @("fcc-desktop", "fcc-server", "fcc-claude", "fcc-codex", "fcc-pi", "fcc-opencode", "fcc-cline", "fcc-hermes", "fcc-dsh", "fcc-grok", "fcc-muse", "fcc-aider", "fcc-doctor", "fcc-update.cmd")) {
+    foreach ($commandName in @("fcc-desktop", "fcc-server", "cwc-claude", "cwc-codex", "cwc-pi", "cwc-opencode", "cwc-cline", "cwc-hermes", "cwc-dsh", "cwc-grok", "cwc-muse", "cwc-aider", "fcc-doctor", "fcc-update.cmd")) {
         $command = Get-ApplicationCommand $commandName
         if (-not $command) {
             throw "Free Claude Code installation did not create '$commandName'."
@@ -1812,9 +1822,13 @@ function Install-FccDesktopShortcuts {
         [string] $IconPath
     )
 
-    $shortcutPaths = @(
+    $legacyShortcutPaths = @(
         (Join-Path $env:USERPROFILE "Desktop\Free Claude Code.lnk"),
         (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Free Claude Code.lnk")
+    )
+    $shortcutPaths = @(
+        (Join-Path $env:USERPROFILE "Desktop\ChatWave Config.lnk"),
+        (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\ChatWave Config.lnk")
     )
     foreach ($shortcutPath in $shortcutPaths) {
         Write-Host "+ create shortcut $(Format-Argument $shortcutPath) -> $(Format-Argument $DesktopCommand)"
@@ -1824,6 +1838,20 @@ function Install-FccDesktopShortcuts {
     }
 
     $shell = New-Object -ComObject WScript.Shell
+    foreach ($legacyShortcutPath in $legacyShortcutPaths) {
+        if (-not (Test-Path -LiteralPath $legacyShortcutPath)) { continue }
+        try {
+            $legacyShortcut = $shell.CreateShortcut($legacyShortcutPath)
+            $isFccShortcut = Test-EquivalentPath -Left $legacyShortcut.TargetPath -Right $DesktopCommand
+        }
+        catch {
+            $isFccShortcut = $false
+        }
+        if ($isFccShortcut) {
+            Write-Host "+ remove legacy shortcut $(Format-Argument $legacyShortcutPath)"
+            Remove-Item -LiteralPath $legacyShortcutPath -Force
+        }
+    }
     foreach ($shortcutPath in $shortcutPaths) {
         if (Test-Path -LiteralPath $shortcutPath) {
             try {
@@ -1834,7 +1862,7 @@ function Install-FccDesktopShortcuts {
                 $isFccShortcut = $false
             }
             if (-not $isFccShortcut) {
-                Write-Host "A shortcut not managed by Free Claude Code already exists at $shortcutPath; leaving it unchanged."
+                Write-Host "A shortcut not managed by ChatWave Config already exists at $shortcutPath; leaving it unchanged."
                 continue
             }
         }
@@ -1844,7 +1872,7 @@ function Install-FccDesktopShortcuts {
         $shortcut.TargetPath = $DesktopCommand
         $shortcut.WorkingDirectory = $env:USERPROFILE
         $shortcut.IconLocation = "$IconPath,0"
-        $shortcut.Description = "Run Free Claude Code in the background"
+        $shortcut.Description = "Run ChatWave Config in the background"
         $shortcut.Save()
         if ($shortcutPath -eq $shortcutPaths[0]) { $script:DesktopReady = $true }
     }
@@ -1853,38 +1881,38 @@ function Install-FccDesktopShortcuts {
 function Show-InstallerNextSteps {
     Write-Host "`nFree Claude Code is installed and verified."
     if ($script:DesktopReady) {
-        Write-Host "Open the Free Claude Code desktop shortcut to run it in the background."
+        Write-Host "Open the ChatWave Config desktop shortcut to run it in the background."
     }
     Write-Host "For terminal use, start the proxy with: fcc-server"
     if ($script:InstallClaudeCode) {
-        Write-Host "Run Claude Code with: fcc-claude"
+        Write-Host "Run Claude Code with: cwc-claude"
     }
     if ($script:InstallCodex) {
-        Write-Host "Run Codex with: fcc-codex"
+        Write-Host "Run Codex with: cwc-codex"
     }
     if ($script:PiAvailable) {
-        Write-Host "Run Pi with: fcc-pi"
+        Write-Host "Run Pi with: cwc-pi"
     }
     if ($script:InstallOpenCode) {
-        Write-Host "Run OpenCode with: fcc-opencode"
+        Write-Host "Run OpenCode with: cwc-opencode"
     }
     if ($script:InstallCline) {
-        Write-Host "Run Cline with: fcc-cline"
+        Write-Host "Run Cline with: cwc-cline"
     }
     if ($script:InstallHermes) {
-        Write-Host "Run Hermes Agent with: fcc-hermes"
+        Write-Host "Run Hermes Agent with: cwc-hermes"
     }
     if ($script:InstallDsh) {
-        Write-Host "Run DeepSeek Harness with: fcc-dsh"
+        Write-Host "Run DeepSeek Harness with: cwc-dsh"
     }
     if ($script:InstallGrok) {
-        Write-Host "Run Grok Build with: fcc-grok"
+        Write-Host "Run Grok Build with: cwc-grok"
     }
     if ($script:MuseAvailable) {
-        Write-Host "Run Muse Code with: fcc-muse"
+        Write-Host "Run Muse Code with: cwc-muse"
     }
     if ($script:InstallAider) {
-        Write-Host "Run Aider with: fcc-aider"
+        Write-Host "Run Aider with: cwc-aider"
     }
 
 }

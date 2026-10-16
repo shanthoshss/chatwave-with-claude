@@ -25,7 +25,7 @@ def smoke_config(tmp_path, monkeypatch):
     home = tmp_path / "user-home"
     monkeypatch.setenv("HOME", str(home))
     monkeypatch.setenv("USERPROFILE", str(home))
-    monkeypatch.setattr(paths, "config_dir_path", lambda: home / ".fcc")
+    monkeypatch.setattr(paths, "config_dir_path", lambda: home / ".cwc")
     store = ManagedConfigStore()
     store.initialize({})
     values = dict(store.read({}).managed)
@@ -143,7 +143,7 @@ def test_explicit_smoke_home_remains_authoritative(smoke_config, tmp_path):
     home = tmp_path / "caller-home"
     atomic_write_managed_config(
         {"FCC_CONFIG_SCHEMA": CONFIG_SCHEMA_VERSION, "ANTHROPIC_AUTH_TOKEN": "caller"},
-        path=home / ".fcc" / ".env",
+        path=home / ".cwc" / ".env",
     )
     with start_server(
         smoke_config,
@@ -152,11 +152,11 @@ def test_explicit_smoke_home_remains_authoritative(smoke_config, tmp_path):
         env_unset={"NVIDIA_NIM_API_KEY", "GROQ_API_KEY", "ANTHROPIC_AUTH_TOKEN"},
     ) as server:
         state = snapshot(server)
-    assert state["config"] == str(home / ".fcc")
+    assert state["config"] == str(home / ".cwc")
     assert state["keys"] == []
     assert state["token"] != "managed-proxy-token"
-    assert state["auth"] == str(home / ".fcc" / "auth" / "openai.json")
-    assert (home / ".fcc").is_dir()
+    assert state["auth"] == str(home / ".cwc" / "auth" / "openai.json")
+    assert (home / ".cwc").is_dir()
 
 
 @pytest.mark.parametrize("failure", ["health", "spawn"])

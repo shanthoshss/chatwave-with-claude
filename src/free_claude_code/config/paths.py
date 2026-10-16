@@ -2,7 +2,8 @@
 
 from pathlib import Path
 
-FCC_CONFIG_DIRNAME = ".fcc"
+CWC_CONFIG_DIRNAME = ".cwc"
+LEGACY_FCC_CONFIG_DIRNAME = ".fcc"
 FCC_ENV_FILENAME = ".env"
 LEGACY_REPO_DIRNAME = "free-claude-code"
 LEGACY_XDG_CONFIG_DIRNAME = ".config"
@@ -28,7 +29,46 @@ CODE_LOCK_FILENAME = "code.lock"
 def config_dir_path() -> Path:
     """Return the default user config directory."""
 
-    return Path.home() / FCC_CONFIG_DIRNAME
+    home = Path.home()
+    config_dir = home / CWC_CONFIG_DIRNAME
+    legacy_dir = home / LEGACY_FCC_CONFIG_DIRNAME
+    if legacy_dir.is_dir() and not legacy_dir.is_symlink():
+        if not config_dir.exists():
+            try:
+                legacy_dir.rename(config_dir)
+            except FileExistsError:
+                _merge_legacy_config_dir(legacy_dir, config_dir)
+            except FileNotFoundError:
+                pass
+        else:
+            _merge_legacy_config_dir(legacy_dir, config_dir)
+    return config_dir
+
+
+def _merge_legacy_config_dir(legacy_dir: Path, config_dir: Path) -> None:
+    config_dir.mkdir(parents=True, exist_ok=True)
+    for legacy_item in legacy_dir.iterdir():
+        config_item = config_dir / legacy_item.name
+        if not config_item.exists() and not config_item.is_symlink():
+            try:
+                legacy_item.rename(config_item)
+            except FileNotFoundError:
+                pass
+        elif (
+            legacy_item.is_dir()
+            and not legacy_item.is_symlink()
+            and config_item.is_dir()
+            and not config_item.is_symlink()
+        ):
+            _merge_legacy_config_dir(legacy_item, config_item)
+            try:
+                legacy_item.rmdir()
+            except OSError:
+                pass
+    try:
+        legacy_dir.rmdir()
+    except OSError:
+        pass
 
 
 def managed_env_path() -> Path:
@@ -77,7 +117,7 @@ def code_lock_path() -> Path:
 
 
 def legacy_env_paths() -> tuple[Path, ...]:
-    """Return legacy user env paths that can be migrated to ~/.fcc/.env."""
+    """Return legacy user env paths that can be migrated to ~/.cwc/.env."""
 
     home = Path.home()
     return (

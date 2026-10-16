@@ -15,7 +15,7 @@ from smoke.product import test_codex_modes_product_live as smoke
 def test_child_review_smoke_reads_canonical_database_without_creating_files(
     tmp_path, monkeypatch, database_exists
 ):
-    home = tmp_path / "home/.fcc"
+    home = tmp_path / "home/.cwc"
     home.mkdir(parents=True)
     (home / "code").mkdir()
     database_path = home / FCC_DATABASE_FILENAME

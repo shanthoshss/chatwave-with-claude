@@ -171,7 +171,7 @@ def admin_base_url(
 ) -> Iterator[str]:
     """Serve one fully isolated Admin application on an OS-assigned port."""
 
-    config_dir = tmp_path / ".fcc"
+    config_dir = tmp_path / ".cwc"
     monkeypatch.setenv("DSH_HOME", str(tmp_path / ".dsh"))
     monkeypatch.delenv("FCC_DSH_DESKTOP_API_KEY", raising=False)
     monkeypatch.setattr(

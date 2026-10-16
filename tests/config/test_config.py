@@ -29,6 +29,7 @@ from free_claude_code.config.model_refs import (
 )
 from free_claude_code.config.nim import NimSettings
 from free_claude_code.config.paths import (
+    config_dir_path,
     managed_env_path,
     messaging_state_dir_path,
     server_log_path,
@@ -322,6 +323,41 @@ def test_get_settings_is_cached_and_creates_managed_schema() -> None:
     assert first is second
 
 
+def test_config_dir_migrates_legacy_fcc_directory(monkeypatch, tmp_path) -> None:
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    legacy = tmp_path / ".fcc"
+    (legacy / "logs").mkdir(parents=True)
+    (legacy / ".env").write_text("MODEL=ollama/legacy\n", encoding="utf-8")
+    (legacy / "logs" / "server.log").write_text("legacy log", encoding="utf-8")
+
+    config_dir = config_dir_path()
+
+    assert config_dir == tmp_path / ".cwc"
+    assert (config_dir / ".env").read_text(encoding="utf-8") == "MODEL=ollama/legacy\n"
+    assert (config_dir / "logs" / "server.log").read_text(encoding="utf-8") == "legacy log"
+    assert not legacy.exists()
+
+
+def test_config_dir_merges_without_overwriting_existing_cwc_data(
+    monkeypatch, tmp_path
+) -> None:
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    legacy = tmp_path / ".fcc"
+    config_dir = tmp_path / ".cwc"
+    (legacy / "logs").mkdir(parents=True)
+    (config_dir / "logs").mkdir(parents=True)
+    (legacy / ".env").write_text("MODEL=ollama/legacy\n", encoding="utf-8")
+    (config_dir / ".env").write_text("MODEL=ollama/current\n", encoding="utf-8")
+    (legacy / "logs" / "server.log").write_text("legacy log", encoding="utf-8")
+    (config_dir / "logs" / "startup.log").write_text("current log", encoding="utf-8")
+
+    assert config_dir_path() == config_dir
+    assert (config_dir / ".env").read_text(encoding="utf-8") == "MODEL=ollama/current\n"
+    assert (config_dir / "logs" / "server.log").read_text(encoding="utf-8") == "legacy log"
+    assert (config_dir / "logs" / "startup.log").read_text(encoding="utf-8") == "current log"
+    assert (legacy / ".env").read_text(encoding="utf-8") == "MODEL=ollama/legacy\n"
+
+
 def _write_managed_config(text: str) -> Path:
     path = managed_env_path()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -598,8 +634,8 @@ def test_paths_are_owned_by_fcc_home(monkeypatch: pytest.MonkeyPatch, tmp_path) 
     monkeypatch.setenv("HOME", str(tmp_path))
     monkeypatch.setenv("USERPROFILE", str(tmp_path))
 
-    assert messaging_state_dir_path() == tmp_path / ".fcc" / "agent_workspace"
-    assert server_log_path() == tmp_path / ".fcc" / "logs" / "server.log"
+    assert messaging_state_dir_path() == tmp_path / ".cwc" / "agent_workspace"
+    assert server_log_path() == tmp_path / ".cwc" / "logs" / "server.log"
 
 
 def test_nim_settings_keep_request_local_validation() -> None:

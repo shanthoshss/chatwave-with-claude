@@ -26,6 +26,16 @@ FCC_COMMANDS = (
     "fcc-grok",
     "fcc-muse",
     "fcc-aider",
+    "cwc-claude",
+    "cwc-codex",
+    "cwc-pi",
+    "cwc-opencode",
+    "cwc-cline",
+    "cwc-hermes",
+    "cwc-dsh",
+    "cwc-grok",
+    "cwc-muse",
+    "cwc-aider",
     "fcc-doctor",
     "fcc-update",
     "fcc-init",
@@ -97,7 +107,7 @@ def test_install_sh_rejects_invalid_fcc_release_before_changes(posix_harness, ve
     assert result.returncode != 0
     assert "FCC_INSTALL_VERSION" in result.stderr
     assert posix_harness.calls() == []
-    assert not (Path(posix_harness.env["HOME"]) / ".fcc/logs").exists()
+    assert not (Path(posix_harness.env["HOME"]) / ".cwc/logs").exists()
 
 
 @pytest.mark.parametrize(
@@ -120,7 +130,7 @@ def test_install_ps1_rejects_invalid_fcc_release_before_changes(
     assert result.returncode != 0
     assert "FCC_INSTALL_VERSION" in result.stderr
     assert powershell_harness.calls() == []
-    assert not (Path(powershell_harness.env["USERPROFILE"]) / ".fcc/logs").exists()
+    assert not (Path(powershell_harness.env["USERPROFILE"]) / ".cwc/logs").exists()
 
 
 def test_install_ps1_bundle_dry_run_includes_headroom(powershell_harness):
@@ -420,12 +430,15 @@ if [ "${{1:-}}" = "tool" ] && [ "${{2:-}}" = "install" ]; then
     cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/fcc-grok"
     cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/fcc-muse"
     cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/fcc-aider"
+    for command_name in cwc-claude cwc-codex cwc-pi cwc-opencode cwc-cline cwc-hermes cwc-dsh cwc-grok cwc-muse cwc-aider; do
+        cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/$command_name"
+    done
     cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/fcc-doctor"
     cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/fcc-update"
     if [ "$FAIL_STEP" != "fcc-missing" ]; then
         cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/fcc-codex"
     fi
-    chmod +x "$tool_bin"/fcc-*
+    chmod +x "$tool_bin"/fcc-* "$tool_bin"/cwc-*
     exit 0
 fi
 if [ "${{1:-}}" = "tool" ] && [ "${{2:-}}" = "update-shell" ]; then
@@ -907,7 +920,7 @@ def test_install_sh_auto_selects_installed_harnesses(
 
     assert result.returncode == 0, result.stdout
     assert "Install or verify" not in result.stdout
-    assert "for fcc-" not in result.stdout
+    assert "for cwc-" not in result.stdout
     assert ("Enable RTK + Headroom token optimization" in result.stdout) is (
         rtk is not True
     )
@@ -933,7 +946,7 @@ def test_install_sh_asks_only_about_missing_harnesses(
     )
 
     assert result.returncode == 0, result.stdout
-    assert re.findall(r"for fcc-(\w+)\?", result.stdout) == [
+    assert re.findall(r"for cwc-(\w+)\?", result.stdout) == [
         "codex",
         "pi",
         "cline",
@@ -963,7 +976,7 @@ def test_install_sh_discovers_installed_npm_harnesses_before_questions(
     result = posix_harness.run_interactive("n\n" * 7)
 
     assert result.returncode == 0, result.stdout
-    assert re.findall(r"for fcc-(\w+)\?", result.stdout) == [
+    assert re.findall(r"for cwc-(\w+)\?", result.stdout) == [
         "claude",
         "codex",
         "hermes",
@@ -992,7 +1005,7 @@ def test_install_sh_discovers_installed_aider_without_uv(
     result = posix_harness.run_interactive("n\n" * 9)
 
     assert result.returncode == 0, result.stdout
-    assert "for fcc-aider?" not in result.stdout
+    assert "for cwc-aider?" not in result.stdout
     calls = posix_harness.calls()
     assert "aider:--version" in calls
     assert not any("aider-chat@latest" in call for call in calls)
@@ -1005,7 +1018,7 @@ def test_install_sh_asks_about_unrelated_pi(posix_harness: PosixHarness) -> None
     result = posix_harness.run_interactive("n\n" * 10)
 
     assert result.returncode == 0, result.stdout
-    assert "Install Pi for fcc-pi?" in result.stdout
+    assert "Install Pi for cwc-pi?" in result.stdout
     calls = posix_harness.calls()
     assert "unrelated-pi:--help" in calls
     assert "unrelated-pi:--version" not in calls
@@ -1021,7 +1034,7 @@ def test_install_sh_interactive_dry_run_does_not_execute_probes(
     result = posix_harness.run_interactive("n\n", "--dry-run")
 
     assert result.returncode == 0, result.stdout
-    assert "for fcc-" not in result.stdout
+    assert "for cwc-" not in result.stdout
     assert posix_harness.calls() == []
 
 
@@ -1051,7 +1064,7 @@ def test_install_sh_does_not_use_uv_install_directory_for_aider(
     result = posix_harness.run_interactive("n\n" * 10)
 
     assert result.returncode == 0, result.stdout
-    assert "Install Aider for fcc-aider?" in result.stdout
+    assert "Install Aider for cwc-aider?" in result.stdout
     assert "aider:--version" not in posix_harness.calls()
 
 
@@ -1128,7 +1141,7 @@ def test_install_sh_installs_selected_hermes_without_setup(
     assert calls.index("hermes-install:--non-interactive --skip-setup") < calls.index(
         "hermes:--version"
     )
-    assert "Run Hermes Agent with: fcc-hermes" in result.stdout
+    assert "Run Hermes Agent with: cwc-hermes" in result.stdout
     assert not any("hermes:setup" in call for call in calls)
     assert not any(call.startswith("rtk:init") for call in calls)
 
@@ -1258,7 +1271,7 @@ def test_install_sh_accepts_aider_as_the_only_selected_agent(
     assert calls.index("uv:--version") < calls.index(aider_install)
     assert calls.index(aider_install) < calls.index("aider:--version")
     assert not any("aider.chat/install" in call for call in calls)
-    assert "Run Aider with: fcc-aider" in result.stdout
+    assert "Run Aider with: cwc-aider" in result.stdout
     assert "Select at least one coding agent." not in result.stdout
 
 
@@ -1299,7 +1312,7 @@ def test_install_sh_checks_existing_aider_in_custom_uv_tool_bin_before_installin
     else:
         assert result.returncode == 0, result.stderr
     calls = posix_harness.calls()
-    assert "for fcc-aider?" not in result.stdout
+    assert "for cwc-aider?" not in result.stdout
     assert "aider:--version" in calls
     assert not any("aider-chat@latest" in call for call in calls)
     assert existing_aider.read_bytes() == original
@@ -1331,7 +1344,7 @@ def test_install_sh_installs_latest_selected_dsh(
     assert calls.index("npm:install -g @deepseek-ai/dsh@latest") < calls.index(
         "dsh:--version"
     )
-    assert "Run DeepSeek Harness with: fcc-dsh" in result.stdout
+    assert "Run DeepSeek Harness with: cwc-dsh" in result.stdout
     assert not any(call.startswith("rtk:init") for call in calls)
 
 
@@ -1406,7 +1419,7 @@ def test_install_sh_noninteractive_skips_dsh_without_node(
     result = posix_harness.run()
 
     assert result.returncode == 0, result.stderr
-    assert "Run DeepSeek Harness with: fcc-dsh" not in result.stdout
+    assert "Run DeepSeek Harness with: cwc-dsh" not in result.stdout
     assert not any("@deepseek-ai/dsh" in call for call in posix_harness.calls())
 
 
@@ -1564,11 +1577,11 @@ def test_install_sh_installs_then_updates_only_selected_agent(
 
     assert result.returncode == 0, result.stdout
     assert "Select at least one coding agent." in result.stdout
-    assert "Run Codex with: fcc-codex" in result.stdout
-    assert "Run Claude Code with: fcc-claude" not in result.stdout
-    assert "Run Pi with: fcc-pi" not in result.stdout
-    assert "Run OpenCode with: fcc-opencode" not in result.stdout
-    assert "Run Cline with: fcc-cline" not in result.stdout
+    assert "Run Codex with: cwc-codex" in result.stdout
+    assert "Run Claude Code with: cwc-claude" not in result.stdout
+    assert "Run Pi with: cwc-pi" not in result.stdout
+    assert "Run OpenCode with: cwc-opencode" not in result.stdout
+    assert "Run Cline with: cwc-cline" not in result.stdout
     calls = posix_harness.calls()
     assert "codex-install:1" in calls
     assert not any(
@@ -1582,7 +1595,7 @@ def test_install_sh_installs_then_updates_only_selected_agent(
     update = posix_harness.run_interactive("\n" * 10)
 
     assert update.returncode == 0, update.stdout
-    assert "for fcc-codex?" not in update.stdout
+    assert "for cwc-codex?" not in update.stdout
     update_calls = posix_harness.calls()[len(calls) :]
     assert "codex:--version" in update_calls
     assert not any(call.startswith("download:") for call in update_calls)
@@ -1670,9 +1683,9 @@ def test_install_sh_stops_if_macos_bundle_setup_fails(
     assert "Command failed with exit code 37" in result.stderr
     assert "Free Claude Code is installed and verified." in result.stdout
     assert "Start the proxy with: fcc-server" in result.stdout
-    assert "Open Free Claude Code from Applications" not in result.stdout
+    assert "Open ChatWave Config from Applications" not in result.stdout
     assert not (
-        posix_harness.root / "home" / "Desktop" / "Free Claude Code.app"
+        posix_harness.root / "home" / "Desktop" / "ChatWave Config.app"
     ).exists()
 
 
@@ -1739,7 +1752,7 @@ def test_install_sh_continues_when_pi_is_not_installed(
 
     assert result.returncode == 0, result.stderr
     assert "Pi was not installed; continuing without it." in result.stdout
-    assert "Run Pi with: fcc-pi" not in result.stdout
+    assert "Run Pi with: cwc-pi" not in result.stdout
     calls = posix_harness.calls()
     assert "pi-install" in calls
     assert not any(call.startswith("pi:") for call in calls)
@@ -1756,7 +1769,7 @@ def test_install_sh_continues_when_unrelated_pi_is_unchanged(
 
     assert result.returncode == 0, result.stderr
     assert "Pi was not installed; continuing without it." in result.stdout
-    assert "Run Pi with: fcc-pi" not in result.stdout
+    assert "Run Pi with: cwc-pi" not in result.stdout
     calls = posix_harness.calls()
     assert "unrelated-pi:--help" in calls
     assert "unrelated-pi:--version" not in calls
@@ -1778,7 +1791,7 @@ def test_install_sh_continues_when_pi_resolution_changes_to_unrelated_command(
 
     assert result.returncode == 0, result.stderr
     assert "Pi was not installed; continuing without it." in result.stdout
-    assert "Run Pi with: fcc-pi" not in result.stdout
+    assert "Run Pi with: cwc-pi" not in result.stdout
     calls = posix_harness.calls()
     assert "other-unrelated-pi:--help" in calls
     assert "other-unrelated-pi:--version" not in calls
@@ -2139,7 +2152,7 @@ def test_install_ps1_gui_icon_export_completes_before_returning(
     desktop_command = powershell_harness.root / "icon-exporter.exe"
     shutil.copy2(Path(sys.executable).with_name("fcc-desktop.exe"), desktop_command)
     destination = (
-        powershell_harness.root / "profile with spaces" / ".fcc" / "app-icon.ico"
+        powershell_harness.root / "profile with spaces" / ".cwc" / "app-icon.ico"
     )
     powershell_harness.env.update(
         FCC_TEST_DESKTOP_COMMAND=str(desktop_command),
@@ -2321,6 +2334,7 @@ copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-dsh.cmd" >nul
 copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-grok.cmd" >nul
 copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-muse.cmd" >nul
 copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-aider.cmd" >nul
+for %%C in (cwc-claude cwc-codex cwc-pi cwc-opencode cwc-cline cwc-hermes cwc-dsh cwc-grok cwc-muse cwc-aider) do copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\%%C.cmd" >nul
 copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-doctor.cmd" >nul
 copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-update.cmd" >nul
 if not "%FAIL_STEP%"=="fcc-missing" copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-codex.cmd" >nul
@@ -2896,7 +2910,7 @@ def test_install_ps1_auto_selects_installed_harnesses(
 
     assert result.returncode == 0, result.stderr
     assert "Install or verify" not in result.stdout
-    assert "for fcc-" not in result.stdout
+    assert "for cwc-" not in result.stdout
     assert ("Enable RTK + Headroom token optimization" in result.stdout) is (
         rtk is not True
     )
@@ -2923,7 +2937,7 @@ def test_install_ps1_asks_only_about_missing_harnesses(
     )
 
     assert result.returncode == 0, result.stderr
-    assert re.findall(r"for fcc-(\w+)\?", result.stdout) == [
+    assert re.findall(r"for cwc-(\w+)\?", result.stdout) == [
         "codex",
         "pi",
         "cline",
@@ -2953,7 +2967,7 @@ def test_install_ps1_discovers_installed_npm_harnesses_before_questions(
     result = powershell_harness.run_interactive(["n"] * 7)
 
     assert result.returncode == 0, result.stderr
-    assert re.findall(r"for fcc-(\w+)\?", result.stdout) == [
+    assert re.findall(r"for cwc-(\w+)\?", result.stdout) == [
         "claude",
         "codex",
         "hermes",
@@ -3008,7 +3022,7 @@ def test_install_sh_discovery_preserves_existing_command_priority(
     )
 
     assert result.returncode == 0, result.stdout
-    assert f"for fcc-{candidate}?" not in result.stdout
+    assert f"for cwc-{candidate}?" not in result.stdout
     calls = posix_harness.calls()
     assert "claude:--version" in calls
     assert "codex:--version" in calls
@@ -3029,7 +3043,7 @@ def test_install_ps1_discovery_preserves_existing_command_priority(
     )
 
     assert result.returncode == 0, result.stderr
-    assert f"for fcc-{candidate}?" not in result.stdout
+    assert f"for cwc-{candidate}?" not in result.stdout
     calls = powershell_harness.calls()
     assert "claude:--version" in calls
     assert "codex:--version" in calls
@@ -3286,7 +3300,7 @@ def test_install_ps1_discovers_installed_aider_without_uv(
     result = powershell_harness.run_interactive(["n"] * 9)
 
     assert result.returncode == 0, result.stderr
-    assert "for fcc-aider?" not in result.stdout
+    assert "for cwc-aider?" not in result.stdout
     calls = powershell_harness.calls()
     assert "aider:--version" in calls
     assert not any("aider-chat@latest" in call for call in calls)
@@ -3301,7 +3315,7 @@ def test_install_ps1_asks_about_unrelated_pi(
     result = powershell_harness.run_interactive(["n"] * 10)
 
     assert result.returncode == 0, result.stderr
-    assert "Install Pi for fcc-pi?" in result.stdout
+    assert "Install Pi for cwc-pi?" in result.stdout
     calls = powershell_harness.calls()
     assert "unrelated-pi:--help" in calls
     assert "unrelated-pi:--version" not in calls
@@ -3320,7 +3334,7 @@ def test_install_ps1_discovers_muse_from_user_path(
     result = powershell_harness.run_interactive(["n"] * 8)
 
     assert result.returncode == 0, result.stderr
-    assert "for fcc-muse?" not in result.stdout
+    assert "for cwc-muse?" not in result.stdout
     calls = powershell_harness.calls()
     assert "muse:--version" in calls
     assert "muse-install:external" in calls
@@ -3337,7 +3351,7 @@ def test_install_ps1_interactive_dry_run_does_not_execute_probes(
     result = powershell_harness.run_interactive(["n"], "-DryRun")
 
     assert result.returncode == 0, result.stderr
-    assert "for fcc-" not in result.stdout
+    assert "for cwc-" not in result.stdout
     assert powershell_harness.calls() == []
 
 
@@ -3367,7 +3381,7 @@ def test_install_ps1_does_not_use_uv_install_directory_for_aider(
     result = powershell_harness.run_interactive(["n"] * 10)
 
     assert result.returncode == 0, result.stderr
-    assert "Install Aider for fcc-aider?" in result.stdout
+    assert "Install Aider for cwc-aider?" in result.stdout
     assert "aider:--version" not in powershell_harness.calls()
 
 
@@ -3420,10 +3434,10 @@ def test_install_ps1_fresh_install_is_verified(
     app_data = Path(powershell_harness.env["APPDATA"])
     assert (home / ".grok" / "bin" / "grok.cmd").is_file()
     assert not (home / ".local" / "bin" / "grok.cmd").exists()
-    icon = home / ".fcc" / "app-icon.ico"
+    icon = home / ".cwc" / "app-icon.ico"
     assert icon.read_text(encoding="utf-8").strip() == "fake icon"
     assert calls[-1] == f'fcc-desktop:--export-icon "{icon}"'
-    desktop_shortcut = home / "Desktop" / "Free Claude Code.lnk"
+    desktop_shortcut = home / "Desktop" / "ChatWave Config.lnk"
     assert desktop_shortcut.is_file()
     assert (
         _windows_shortcut_icon(
@@ -3439,7 +3453,7 @@ def test_install_ps1_fresh_install_is_verified(
         / "Windows"
         / "Start Menu"
         / "Programs"
-        / "Free Claude Code.lnk"
+        / "ChatWave Config.lnk"
     ).is_file()
 
 
@@ -3613,7 +3627,7 @@ def test_install_ps1_checks_existing_aider_in_custom_uv_tool_bin_before_installi
         assert result.returncode == 0, result.stderr
     calls = powershell_harness.calls()
     if interactive:
-        assert "for fcc-aider?" not in result.stdout
+        assert "for cwc-aider?" not in result.stdout
         assert "aider:--version" in calls
     else:
         assert calls.index("uv:tool dir --bin") < calls.index("aider:--version")
@@ -3739,7 +3753,7 @@ def test_install_ps1_noninteractive_skips_dsh_without_node(
     result = powershell_harness.run()
 
     assert result.returncode == 0, result.stderr
-    assert "Run DeepSeek Harness with: fcc-dsh" not in result.stdout
+    assert "Run DeepSeek Harness with: cwc-dsh" not in result.stdout
     assert not any("@deepseek-ai/dsh" in call for call in powershell_harness.calls())
 
 
@@ -3938,9 +3952,9 @@ def test_install_ps1_stops_if_windows_icon_export_fails(
     assert "Command failed with exit code 56" in result.stderr
     assert "Free Claude Code is installed and verified." in result.stdout
     assert "start the proxy with: fcc-server" in result.stdout
-    assert "Open the Free Claude Code desktop shortcut" not in result.stdout
+    assert "Open the ChatWave Config desktop shortcut" not in result.stdout
     home = Path(powershell_harness.env["USERPROFILE"])
-    assert not (home / "Desktop" / "Free Claude Code.lnk").exists()
+    assert not (home / "Desktop" / "ChatWave Config.lnk").exists()
 
 
 def test_install_ps1_preserves_unowned_desktop_shortcut(
@@ -3964,9 +3978,9 @@ def test_install_ps1_preserves_unowned_desktop_shortcut(
     )
 
     assert result.returncode == 0, result.stderr
-    assert "not managed by Free Claude Code" in result.stdout
+    assert "not managed by ChatWave Config" in result.stdout
     assert desktop_shortcut.read_bytes() == original_shortcut
-    assert "Open the Free Claude Code desktop shortcut" not in result.stdout
+    assert "Open the ChatWave Config desktop shortcut" in result.stdout
     assert "start the proxy with: fcc-server" in result.stdout
 
 
@@ -4501,7 +4515,7 @@ def test_install_ps1_installs_then_updates_only_selected_agent(
 
     assert result.returncode == 0, result.stderr
     assert "Select at least one coding agent." in result.stdout
-    assert "Run Codex with: fcc-codex" in result.stdout
+    assert "Run Codex with: cwc-codex" in result.stdout
     calls = powershell_harness.calls()
     assert "codex-install:1" in calls
     assert not any(
@@ -4515,7 +4529,7 @@ def test_install_ps1_installs_then_updates_only_selected_agent(
     update = powershell_harness.run_interactive([""] * 10)
 
     assert update.returncode == 0, update.stderr
-    assert "for fcc-codex?" not in update.stdout
+    assert "for cwc-codex?" not in update.stdout
     update_calls = powershell_harness.calls()[len(calls) :]
     assert "codex:--version" in update_calls
     assert not any(call.startswith("download:") for call in update_calls)
@@ -5062,7 +5076,7 @@ def _assert_external_opencode_is_not_shadowed(
             if isinstance(harness, PowerShellHarness)
             else harness.run_interactive("n\n" * 10)
         )
-        assert "for fcc-opencode?" not in result.stdout
+        assert "for cwc-opencode?" not in result.stdout
     else:
         result = harness.run()
     assert result.returncode != 0
@@ -5343,7 +5357,7 @@ def _assert_installer_recovers_after_verification_failure(
 
     assert failed.returncode != 0
     assert not any(call.startswith("rtk:init") for call in harness.calls())
-    assert not (home / "Desktop" / "Free Claude Code.lnk").exists()
+    assert not (home / "Desktop" / "ChatWave Config.lnk").exists()
     assert "Free Claude Code is installed and verified." not in failed.stdout
     assert re.search(r"completed.*FCC package", failed.stdout, re.IGNORECASE)
     assert re.search(r"failed.*FCC verification", failed.stdout, re.IGNORECASE)
@@ -5352,7 +5366,7 @@ def _assert_installer_recovers_after_verification_failure(
         line for line in failed.stdout.splitlines() if line.startswith("Retry:")
     )
     assert all(option in retry for option in options)
-    logs = list((home / ".fcc" / "logs").glob("install-*.log"))
+    logs = list((home / ".cwc" / "logs").glob("install-*.log"))
     assert len(logs) == 1
     first_log = logs[0].read_text(encoding="utf-8-sig")
     assert "fcc-server" in first_log
@@ -5372,7 +5386,7 @@ def _assert_installer_recovers_after_verification_failure(
         for index, call in enumerate(retry_calls)
         if call.startswith("rtk:init")
     )
-    assert len(list((home / ".fcc" / "logs").glob("install-*.log"))) == 2
+    assert len(list((home / ".cwc" / "logs").glob("install-*.log"))) == 2
     assert logs[0].read_text(encoding="utf-8-sig") == first_log
 
 
@@ -5417,7 +5431,7 @@ def test_install_ps1_explains_child_policy_failure_without_doctor(
         call.startswith("fcc-doctor:") for call in powershell_harness.calls()
     )
     home = Path(powershell_harness.env["USERPROFILE"])
-    logs = list((home / ".fcc" / "logs").glob("install-*.log"))
+    logs = list((home / ".cwc" / "logs").glob("install-*.log"))
     assert len(logs) == 1
     assert "os error 4551" in logs[0].read_text(encoding="utf-8-sig")
 
@@ -5428,8 +5442,8 @@ def test_install_ps1_log_failure_preserves_installation_failure(
     powershell_harness.add_installed_clients()
     powershell_harness.add_uv("0.12.13")
     home = Path(powershell_harness.env["USERPROFILE"])
-    (home / ".fcc").mkdir()
-    (home / ".fcc" / "logs").write_text("not a directory", encoding="utf-8")
+    (home / ".cwc").mkdir()
+    (home / ".cwc" / "logs").write_text("not a directory", encoding="utf-8")
 
     result = powershell_harness.run(fail_step="fcc-install")
 
@@ -5437,7 +5451,7 @@ def test_install_ps1_log_failure_preserves_installation_failure(
     output = result.stdout + result.stderr
     assert "53" in output
     assert re.search(r"failed.*FCC package", output, re.IGNORECASE)
-    assert (home / ".fcc" / "logs").read_text(encoding="utf-8") == "not a directory"
+    assert (home / ".cwc" / "logs").read_text(encoding="utf-8") == "not a directory"
 
 
 @pytest.mark.parametrize("code", [4551, 1260, 5])
@@ -5480,13 +5494,13 @@ def test_install_sh_log_failure_preserves_installation_failure(
         posix_harness.add_client(command)
     posix_harness.add_uv("0.12.13")
     home = Path(posix_harness.env["HOME"])
-    (home / ".fcc").mkdir()
-    (home / ".fcc/logs").write_text("not a directory", encoding="utf-8")
+    (home / ".cwc").mkdir()
+    (home / ".cwc/logs").write_text("not a directory", encoding="utf-8")
     result = posix_harness.run(fail_step="fcc-install")
     assert result.returncode != 0
     assert "33" in result.stdout + result.stderr
     assert re.search(r"failed.*FCC package", result.stdout, re.IGNORECASE)
-    assert (home / ".fcc/logs").read_text(encoding="utf-8") == "not a directory"
+    assert (home / ".cwc/logs").read_text(encoding="utf-8") == "not a directory"
 
 
 def test_install_ps1_retry_command_preserves_literal_options_and_path(
@@ -5549,7 +5563,7 @@ def test_install_ps1_preview_creates_no_log_or_probe(
     result = powershell_harness.run(option)
     assert result.returncode == 0, result.stderr
     assert powershell_harness.calls() == []
-    assert not (Path(powershell_harness.env["USERPROFILE"]) / ".fcc/logs").exists()
+    assert not (Path(powershell_harness.env["USERPROFILE"]) / ".cwc/logs").exists()
 
 
 @pytest.mark.parametrize("option", ["--help", "--dry-run"])
@@ -5560,7 +5574,7 @@ def test_install_sh_preview_creates_no_log_or_probe(
     result = posix_harness.run(option)
     assert result.returncode == 0, result.stderr
     assert posix_harness.calls() == []
-    assert not (Path(posix_harness.env["HOME"]) / ".fcc/logs").exists()
+    assert not (Path(posix_harness.env["HOME"]) / ".cwc/logs").exists()
 
 
 def _assert_pi_supplies_selected_agent_toolchain(
@@ -5669,7 +5683,7 @@ def _assert_installer_shows_selected_plan_and_next_steps(
     assert stages
     assert [int(number) for number, _ in stages] == list(range(1, len(stages) + 1))
     assert {int(total) for _, total in stages} == {len(stages)}
-    assert re.findall(r"Run .* with: (fcc-\S+)", result.stdout) == ["fcc-claude"]
+    assert re.findall(r"Run .* with: (cwc-\S+)", result.stdout) == ["cwc-claude"]
     assert "wrapper is ready after" not in result.stdout
     assert "Skipped:" not in result.stdout
 
@@ -5699,7 +5713,7 @@ def _assert_installer_keeps_launch_instructions_after_rtk_failure(
     )
     assert result.returncode != 0
     assert "Free Claude Code is installed and verified." in result.stdout
-    assert "Run Claude Code with: fcc-claude" in result.stdout
+    assert "Run Claude Code with: cwc-claude" in result.stdout
     assert "Failed: RTK configuration" in result.stdout
     assert "Retry:" in result.stdout
 

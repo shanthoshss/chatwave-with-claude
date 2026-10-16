@@ -193,7 +193,7 @@ def secret_env_keys() -> frozenset[str]:
 def consolidate_managed_config(
     env: Mapping[str, str] | None = None,
 ) -> ConfigMigrationResult:
-    """Consolidate pre-schema configuration into ``~/.fcc/.env`` once."""
+    """Consolidate pre-schema configuration into ``~/.cwc/.env`` once."""
 
     process = env if env is not None else os.environ
     managed = managed_env_path()

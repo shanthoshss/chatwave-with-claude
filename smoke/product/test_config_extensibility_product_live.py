@@ -31,7 +31,7 @@ def _isolated_config_env(home: Path) -> dict[str, str]:
 
 
 def _write_managed_config(home: Path, text: str) -> None:
-    path = home / ".fcc" / ".env"
+    path = home / ".cwc" / ".env"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(f"FCC_CONFIG_SCHEMA=1\n{text}", encoding="utf-8")
 
@@ -85,7 +85,7 @@ def test_removed_env_migration_e2e(smoke_config: SmokeConfig, tmp_path) -> None:
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip() == "deepseek/imported-once"
     assert env_file.read_text(encoding="utf-8") == original
-    managed = home / ".fcc" / ".env"
+    managed = home / ".cwc" / ".env"
     first = managed.read_bytes()
 
     env_file.write_text('MODEL="groq/changed-later"\n', encoding="utf-8")

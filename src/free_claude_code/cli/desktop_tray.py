@@ -16,9 +16,9 @@ class PystrayDesktopTray:
     def __init__(self, controller: DesktopController) -> None:
         self._controller = controller
         self._icon = Icon(
-            "free-claude-code",
+            "chatwave-config",
             _create_icon(),
-            "Free Claude Code",
+            "ChatWave Config",
             Menu(
                 MenuItem("Open Admin", self._open_admin, default=True),
                 MenuItem("Check Server Status", self._check_status),
@@ -44,7 +44,7 @@ class PystrayDesktopTray:
     def _check_status(self, _icon: Icon, _item: MenuItem) -> None:
         self._icon.notify(
             f"Server is {self._controller.status}.",
-            "Free Claude Code",
+            "ChatWave Config",
         )
 
     def _restart_server(self, _icon: Icon, _item: MenuItem) -> None:

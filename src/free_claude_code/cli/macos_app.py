@@ -18,6 +18,8 @@ from free_claude_code.cli.desktop_assets import export_app_icon
 
 BUNDLE_ID = "io.github.alishahryar1.free-claude-code"
 OWNER_FILE = ".free-claude-code-owner"
+APP_NAME = "ChatWave Config.app"
+LEGACY_APP_NAME = "Free Claude Code.app"
 
 
 def runtime_settings() -> tuple[dict[str, str], str]:
@@ -34,7 +36,7 @@ def runtime_settings() -> tuple[dict[str, str], str]:
     requirement = metadata("free-claude-code")["Requires-Python"]
     if not requirement or version not in SpecifierSet(requirement):
         raise ValueError(
-            "The installed Python version does not match Free Claude Code."
+            "The installed Python version does not match ChatWave Config."
         )
     architecture = platform.machine()
     if architecture not in {"arm64", "x86_64"}:
@@ -72,11 +74,13 @@ def install() -> Path:
     if sys.platform != "darwin":
         raise ValueError("Application installation is supported only on macOS.")
     home = Path.home()
-    app = home / "Applications/Free Claude Code.app"
+    app = home / "Applications" / APP_NAME
     if (app.exists() or app.is_symlink()) and not is_owned(app):
         raise ValueError(
-            f"An app not managed by Free Claude Code already exists at {app}."
+            f"An app not managed by ChatWave Config already exists at {app}."
         )
+    legacy_app = home / "Applications" / LEGACY_APP_NAME
+    remove_legacy_app = legacy_app.exists() and is_owned(legacy_app)
     settings, architecture = runtime_settings()
     template = (
         files("free_claude_code")
@@ -103,11 +107,11 @@ def install() -> Path:
         with (contents / "Info.plist").open("wb") as stream:
             plistlib.dump(
                 {
-                    "CFBundleDisplayName": "Free Claude Code",
+                    "CFBundleDisplayName": "ChatWave Config",
                     "CFBundleExecutable": "fcc-desktop",
                     "CFBundleIdentifier": BUNDLE_ID,
                     "CFBundleIconFile": "AppIcon",
-                    "CFBundleName": "Free Claude Code",
+                    "CFBundleName": "ChatWave Config",
                     "CFBundlePackageType": "APPL",
                     "LSMultipleInstancesProhibited": True,
                     "LSUIElement": True,
@@ -136,12 +140,17 @@ def install() -> Path:
             print(
                 f"The previous application is preserved at {backup}.", file=sys.stderr
             )
-    desktop = home / "Desktop/Free Claude Code.app"
+    legacy_desktop = home / "Desktop" / LEGACY_APP_NAME
+    if remove_legacy_app:
+        shutil.rmtree(legacy_app)
+        if legacy_desktop.is_symlink() and legacy_desktop.readlink() == legacy_app:
+            legacy_desktop.unlink()
+    desktop = home / "Desktop" / APP_NAME
     desktop.parent.mkdir(parents=True, exist_ok=True)
     if desktop.is_symlink() and desktop.readlink() == app:
         return app
     if desktop.exists() or desktop.is_symlink():
-        print(f"A non-FCC item already exists at {desktop}; leaving it unchanged.")
+        print(f"A non-ChatWave Config item already exists at {desktop}; leaving it unchanged.")
     else:
         desktop.symlink_to(app, target_is_directory=True)
     return app

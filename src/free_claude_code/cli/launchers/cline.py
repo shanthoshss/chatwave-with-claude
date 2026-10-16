@@ -1,7 +1,7 @@
 """Installed Cline launcher with private native provider settings.
 
 Sessions run with an isolated Hub discovery path so a stale or user-run Cline
-Hub can never capture an fcc-cline session: the child resolves Hub state only
+Hub can never capture a cwc-cline session: the child resolves Hub state only
 inside FCC's ephemeral configuration directory, which is deleted on exit. A
 Hub started with ordinary cline keeps using its own discovery file.
 """

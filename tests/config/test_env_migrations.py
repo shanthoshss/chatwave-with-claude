@@ -83,7 +83,7 @@ def test_retirement_atomic_write_failure_preserves_managed_file(monkeypatch, tmp
 
 
 def _paths(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> tuple[Path, Path]:
-    managed = tmp_path / ".fcc" / ".env"
+    managed = tmp_path / ".cwc" / ".env"
     legacy = tmp_path / "legacy" / ".env"
     monkeypatch.setattr(env_migrations, "managed_env_path", lambda: managed)
     monkeypatch.setattr(env_migrations, "legacy_env_paths", lambda: (legacy,))

@@ -111,7 +111,7 @@ def installed_desktop(tmp_path_factory):
         check=True,
         timeout=30,
     )
-    app = home / "Applications/Free Claude Code.app"
+    app = home / "Applications/ChatWave Config.app"
     with (app / "Contents/Resources/runtime.plist").open("rb") as stream:
         runtime = plistlib.load(stream)
     # Launch Services receives explicit private settings; no launchd-wide changes.

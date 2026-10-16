@@ -19,6 +19,16 @@ FCC_COMMANDS = (
     "fcc-grok",
     "fcc-muse",
     "fcc-aider",
+    "cwc-claude",
+    "cwc-codex",
+    "cwc-pi",
+    "cwc-opencode",
+    "cwc-cline",
+    "cwc-hermes",
+    "cwc-dsh",
+    "cwc-grok",
+    "cwc-muse",
+    "cwc-aider",
     "fcc-doctor",
     "fcc-update",
     "fcc-init",
@@ -131,10 +141,12 @@ def posix_uninstall_harness(tmp_path: Path) -> PosixUninstallHarness:
     bin_dir = home / ".local" / "bin"
     tool_bin = tmp_path / "tool-bin"
     fcc_home = home / ".fcc"
+    cwc_home = home / ".cwc"
     log = tmp_path / "calls.log"
-    for path in (bin_dir, tool_bin, fcc_home):
+    for path in (bin_dir, tool_bin, fcc_home, cwc_home):
         path.mkdir(parents=True)
     (fcc_home / "config.json").write_text("{}", encoding="utf-8")
+    (cwc_home / "config.json").write_text("{}", encoding="utf-8")
     for name in FCC_COMMANDS:
         _write_executable(tool_bin / name, "#!/bin/sh\nexit 0\n")
 
@@ -193,7 +205,7 @@ if [ "${1:-}" = "tool" ] && [ "${2:-}" = "uninstall" ]; then
         echo 'Tool `free-claude-code` is not installed' >&2
         exit 2
     fi
-    for name in fcc-desktop fcc-server fcc-claude fcc-codex fcc-pi fcc-opencode fcc-cline fcc-hermes fcc-dsh fcc-grok fcc-muse fcc-aider fcc-doctor fcc-update fcc-init free-claude-code; do
+    for name in fcc-desktop fcc-server fcc-claude fcc-codex fcc-pi fcc-opencode fcc-cline fcc-hermes fcc-dsh fcc-grok fcc-muse fcc-aider cwc-claude cwc-codex cwc-pi cwc-opencode cwc-cline cwc-hermes cwc-dsh cwc-grok cwc-muse cwc-aider fcc-doctor fcc-update fcc-init free-claude-code; do
         /bin/rm -f "$FAKE_TOOL_BIN/$name"
     done
     echo "Uninstalled free-claude-code"
@@ -262,6 +274,7 @@ def test_uninstall_sh_removes_and_verifies_only_fcc(
     assert result.returncode == 0, result.stderr
     assert "Free Claude Code has been removed and verified." in result.stdout
     assert not posix_uninstall_harness.fcc_home.exists()
+    assert not (posix_uninstall_harness.home / ".cwc").exists()
     assert all(
         not (posix_uninstall_harness.tool_bin / name).exists() for name in FCC_COMMANDS
     )
@@ -301,6 +314,7 @@ def test_uninstall_sh_removes_and_verifies_only_fcc(
         "uv:tool uninstall free-claude-code",
         f"rm:-f {posix_uninstall_harness.home / 'Desktop' / 'Free Claude Code.app'}",
         f"rm:-rf {posix_uninstall_harness.home / 'Applications' / 'Free Claude Code.app'}",
+        f"rm:-rf {posix_uninstall_harness.home / '.cwc'}",
         f"rm:-rf {posix_uninstall_harness.fcc_home}",
     ]
 
@@ -533,12 +547,14 @@ def powershell_uninstall_harness(
     bin_dir = home / ".local" / "bin"
     tool_bin = tmp_path / "tool-bin"
     fcc_home = home / ".fcc"
+    cwc_home = home / ".cwc"
     app_data = tmp_path / "app-data"
     local_app_data = tmp_path / "local-app-data"
     log = tmp_path / "calls.log"
-    for path in (bin_dir, tool_bin, fcc_home, app_data, local_app_data):
+    for path in (bin_dir, tool_bin, fcc_home, cwc_home, app_data, local_app_data):
         path.mkdir(parents=True)
     (fcc_home / "config.json").write_text("{}", encoding="utf-8")
+    (cwc_home / "config.json").write_text("{}", encoding="utf-8")
     for name in FCC_COMMANDS:
         (tool_bin / f"{name}.cmd").write_text(
             "@echo off\nexit /b 0\n", encoding="utf-8"
@@ -687,6 +703,7 @@ def test_uninstall_ps1_removes_and_verifies_only_fcc(
     assert result.returncode == 0, result.stderr
     assert "Free Claude Code has been removed and verified." in result.stdout
     assert not powershell_uninstall_harness.fcc_home.exists()
+    assert not (powershell_uninstall_harness.home / ".cwc").exists()
     assert all(
         not (powershell_uninstall_harness.tool_bin / f"{name}.cmd").exists()
         for name in FCC_COMMANDS
@@ -725,6 +742,7 @@ def test_uninstall_ps1_removes_and_verifies_only_fcc(
         "uv:tool uninstall free-claude-code",
         f"remove:{Path(powershell_uninstall_harness.env['USERPROFILE']) / 'Desktop' / 'Free Claude Code.lnk'}",
         f"remove:{Path(powershell_uninstall_harness.env['APPDATA']) / 'Microsoft' / 'Windows' / 'Start Menu' / 'Programs' / 'Free Claude Code.lnk'}",
+        f"remove:{powershell_uninstall_harness.home / '.cwc'}",
         f"remove:{powershell_uninstall_harness.fcc_home}",
     ]
 

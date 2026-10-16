@@ -245,8 +245,8 @@ def test_dsh_desktop_live_catalog_credentials_and_restart_e2e(
 
     def server_env(upstream: str, token: str, name: str) -> dict[str, str]:
         root = tmp_path / name
-        (root / ".fcc").mkdir(parents=True)
-        (root / ".fcc/.env").write_text(
+        (root / ".cwc").mkdir(parents=True)
+        (root / ".cwc/.env").write_text(
             f"FCC_CONFIG_SCHEMA=1\nANTHROPIC_AUTH_TOKEN={token}\nPROXY_AUTH_ENABLED=true\n",
             encoding="utf-8",
         )

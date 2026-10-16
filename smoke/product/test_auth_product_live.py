@@ -10,7 +10,7 @@ pytestmark = [pytest.mark.live, pytest.mark.smoke_target("auth")]
 def test_api_bearer_auth_contract_e2e(smoke_config: SmokeConfig, tmp_path) -> None:
     token = "product-smoke-token"
     home = tmp_path / "home"
-    env_file = home / ".fcc" / ".env"
+    env_file = home / ".cwc" / ".env"
     env_file.parent.mkdir(parents=True)
     env_file.write_text(
         "FCC_CONFIG_SCHEMA=1\n"

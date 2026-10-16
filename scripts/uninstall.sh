@@ -2,11 +2,12 @@
 set -eu
 
 PACKAGE_NAME="free-claude-code"
-FCC_HOME_DIRNAME=".fcc"
+FCC_HOME_DIRNAME=".cwc"
+LEGACY_FCC_HOME_DIRNAME=".fcc"
 FCC_MACOS_BUNDLE_ID="io.github.alishahryar1.free-claude-code"
 FCC_MACOS_OWNER_FILE=".free-claude-code-owner"
 # Include retired entry points so older installations are fully stopped and removed.
-FCC_COMMANDS="fcc-desktop fcc-server fcc-claude fcc-codex fcc-pi fcc-opencode fcc-cline fcc-hermes fcc-dsh fcc-grok fcc-muse fcc-aider fcc-doctor fcc-update fcc-init free-claude-code"
+FCC_COMMANDS="fcc-desktop fcc-server fcc-claude fcc-codex fcc-pi fcc-opencode fcc-cline fcc-hermes fcc-dsh fcc-grok fcc-muse fcc-aider cwc-claude cwc-codex cwc-pi cwc-opencode cwc-cline cwc-hermes cwc-dsh cwc-grok cwc-muse cwc-aider fcc-doctor fcc-update fcc-init free-claude-code"
 
 dry_run=0
 uv_tool_bin=""
@@ -15,7 +16,7 @@ show_usage() {
     cat <<'USAGE'
 Usage: uninstall.sh [options]
 
-Removes the Free Claude Code uv tool and deletes ~/.fcc/ after removal is verified.
+Removes the Free Claude Code uv tool and deletes ~/.cwc/ and legacy ~/.fcc/ after removal is verified.
 Does not remove uv, Claude Code, Codex, Pi, OpenCode, Cline, Hermes Agent, DeepSeek Harness, Grok Build, Muse Code, Aider, the uv-managed Python runtime, or shared PATH entries.
 
 Options:
@@ -146,7 +147,7 @@ initialize_uv_context() {
     fi
 
     if ! command -v uv >/dev/null 2>&1; then
-        fail "uv is required to remove the Free Claude Code tool. Install uv, then rerun this uninstaller; ~/.fcc was not deleted."
+        fail "uv is required to remove the Free Claude Code tool. Install uv, then rerun this uninstaller; ~/.cwc and ~/.fcc were not deleted."
     fi
 
     print_command uv tool dir --bin
@@ -154,9 +155,9 @@ initialize_uv_context() {
         :
     else
         status=$?
-        fail "Could not determine the uv tool bin directory (exit code $status); ~/.fcc was not deleted."
+        fail "Could not determine the uv tool bin directory (exit code $status); ~/.cwc and ~/.fcc were not deleted."
     fi
-    [ -n "$uv_tool_bin" ] || fail "uv returned an empty tool bin directory; ~/.fcc was not deleted."
+    [ -n "$uv_tool_bin" ] || fail "uv returned an empty tool bin directory; ~/.cwc and ~/.fcc were not deleted."
 }
 
 uninstall_free_claude_code() {
@@ -181,7 +182,7 @@ uninstall_free_claude_code() {
     if [ -n "$output" ]; then
         printf '%s\n' "$output" >&2
     fi
-    fail "uv tool uninstall $PACKAGE_NAME failed with exit code $status; ~/.fcc was not deleted."
+    fail "uv tool uninstall $PACKAGE_NAME failed with exit code $status; ~/.cwc and ~/.fcc were not deleted."
 }
 
 verify_fcc_commands_removed() {
@@ -198,7 +199,7 @@ verify_fcc_commands_removed() {
         fi
     done
     if [ -n "$remaining" ]; then
-        fail "Free Claude Code entry points remain after uv uninstall:${remaining}; ~/.fcc was not deleted."
+        fail "Free Claude Code entry points remain after uv uninstall:${remaining}; ~/.cwc and ~/.fcc were not deleted."
     fi
 }
 
@@ -216,43 +217,47 @@ macos_app_is_fcc_owned() {
 remove_macos_desktop_app() {
     [ "$(uname -s)" = "Darwin" ] || return 0
 
-    app_dir="$HOME/Applications/Free Claude Code.app"
-    desktop_link="$HOME/Desktop/Free Claude Code.app"
+    for app_name in "ChatWave Config.app" "Free Claude Code.app"; do
+        app_dir="$HOME/Applications/$app_name"
+        desktop_link="$HOME/Desktop/$app_name"
 
-    if ! macos_app_is_fcc_owned "$app_dir"; then
-        if [ -e "$app_dir" ] || [ -L "$app_dir" ]; then
-            printf 'An app not managed by Free Claude Code exists at %s; leaving it unchanged.\n' "$app_dir"
+        if ! macos_app_is_fcc_owned "$app_dir"; then
+            if [ -e "$app_dir" ] || [ -L "$app_dir" ]; then
+                printf 'An app not managed by ChatWave Config exists at %s; leaving it unchanged.\n' "$app_dir"
+            fi
+            continue
         fi
-        if [ -e "$desktop_link" ] || [ -L "$desktop_link" ]; then
-            printf 'The Free Claude Code desktop item cannot be verified; leaving it unchanged.\n'
-        fi
-        return 0
-    fi
 
-    if [ -L "$desktop_link" ]; then
-        if [ "$(readlink "$desktop_link")" = "$app_dir" ]; then
-            run rm -f "$desktop_link"
-        else
-            printf 'A non-FCC link exists at %s; leaving it unchanged.\n' "$desktop_link"
+        if [ -L "$desktop_link" ]; then
+            if [ "$(readlink "$desktop_link")" = "$app_dir" ]; then
+                run rm -f "$desktop_link"
+            else
+                printf 'A non-ChatWave Config link exists at %s; leaving it unchanged.\n' "$desktop_link"
+            fi
+        elif [ -e "$desktop_link" ]; then
+            printf 'A non-ChatWave Config item exists at %s; leaving it unchanged.\n' "$desktop_link"
         fi
-    elif [ -e "$desktop_link" ]; then
-        printf 'A non-FCC item exists at %s; leaving it unchanged.\n' "$desktop_link"
-    fi
-    if [ -e "$app_dir" ]; then
-        run rm -rf "$app_dir"
-    fi
+        if [ -e "$app_dir" ]; then
+            run rm -rf "$app_dir"
+        fi
+    done
 }
 
 purge_fcc_home() {
-    fcc_home="$HOME/$FCC_HOME_DIRNAME"
-    if [ ! -e "$fcc_home" ]; then
-        printf 'No FCC config directory at %s; skipping purge.\n' "$fcc_home"
-        return 0
-    fi
-
-    run rm -rf "$fcc_home"
-    if [ "$dry_run" -eq 0 ] && [ -e "$fcc_home" ]; then
-        fail "FCC config directory still exists after deletion: $fcc_home"
+    found=0
+    for dirname in "$FCC_HOME_DIRNAME" "$LEGACY_FCC_HOME_DIRNAME"; do
+        fcc_home="$HOME/$dirname"
+        if [ ! -e "$fcc_home" ]; then
+            continue
+        fi
+        found=1
+        run rm -rf "$fcc_home"
+        if [ "$dry_run" -eq 0 ] && [ -e "$fcc_home" ]; then
+            fail "FCC config directory still exists after deletion: $fcc_home"
+        fi
+    done
+    if [ "$found" -eq 0 ]; then
+        printf 'No CWC config directory at %s; skipping purge.\n' "$HOME/$FCC_HOME_DIRNAME"
     fi
 }
 
@@ -293,7 +298,7 @@ verify_fcc_commands_removed
 step "Removing the Free Claude Code desktop launcher"
 remove_macos_desktop_app
 
-step "Purging FCC config and data from ~/.fcc"
+step "Purging ChatWave Config data from ~/.cwc and legacy ~/.fcc"
 purge_fcc_home
 
 if [ "$dry_run" -eq 1 ]; then

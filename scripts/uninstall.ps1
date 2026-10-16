@@ -9,7 +9,8 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $PackageName = "free-claude-code"
-$FccHomeDirname = ".fcc"
+$FccHomeDirname = ".cwc"
+$LegacyFccHomeDirname = ".fcc"
 $FccCommands = @(
     # Include retired entry points so older installations are fully stopped and removed.
     "fcc-desktop",
@@ -24,6 +25,16 @@ $FccCommands = @(
     "fcc-grok",
     "fcc-muse",
     "fcc-aider",
+    "cwc-claude",
+    "cwc-codex",
+    "cwc-pi",
+    "cwc-opencode",
+    "cwc-cline",
+    "cwc-hermes",
+    "cwc-dsh",
+    "cwc-grok",
+    "cwc-muse",
+    "cwc-aider",
     "fcc-doctor",
     "fcc-update",
     "fcc-init",
@@ -36,7 +47,7 @@ function Show-Usage {
     @"
 Usage: uninstall.ps1 [options]
 
-Removes the Free Claude Code uv tool and deletes ~/.fcc/ after removal is verified.
+Removes the Free Claude Code uv tool and deletes ~/.cwc/ and legacy ~/.fcc/ after removal is verified.
 Does not remove uv, Claude Code, Codex, Pi, OpenCode, Cline, Hermes Agent, DeepSeek Harness, Grok Build, Muse Code, Aider, the uv-managed Python runtime, or shared PATH entries.
 
 Options:
@@ -153,7 +164,7 @@ function Initialize-UvContext {
 
     $uvCommand = Get-ApplicationCommand "uv"
     if (-not $uvCommand) {
-        throw "uv is required to remove the Free Claude Code tool. Install uv, then rerun this uninstaller; ~/.fcc was not deleted."
+        throw "uv is required to remove the Free Claude Code tool. Install uv, then rerun this uninstaller; ~/.cwc and ~/.fcc were not deleted."
     }
     $script:UvPath = $uvCommand.Source
 
@@ -164,11 +175,11 @@ function Initialize-UvContext {
         if (-not [string]::IsNullOrWhiteSpace($result.Output)) {
             [Console]::Error.WriteLine($result.Output)
         }
-        throw "Could not determine the uv tool bin directory (exit code $($result.ExitCode)); ~/.fcc was not deleted."
+        throw "Could not determine the uv tool bin directory (exit code $($result.ExitCode)); ~/.cwc and ~/.fcc were not deleted."
     }
     $script:UvToolBin = $result.Output.Trim()
     if ([string]::IsNullOrWhiteSpace($script:UvToolBin)) {
-        throw "uv returned an empty tool bin directory; ~/.fcc was not deleted."
+        throw "uv returned an empty tool bin directory; ~/.cwc and ~/.fcc were not deleted."
     }
 }
 
@@ -196,7 +207,7 @@ function Uninstall-FreeClaudeCode {
     if (-not [string]::IsNullOrWhiteSpace($result.Output)) {
         [Console]::Error.WriteLine($result.Output)
     }
-    throw "uv tool uninstall $PackageName failed with exit code $($result.ExitCode); ~/.fcc was not deleted."
+    throw "uv tool uninstall $PackageName failed with exit code $($result.ExitCode); ~/.cwc and ~/.fcc were not deleted."
 }
 
 function Confirm-FccCommandsRemoved {
@@ -216,7 +227,7 @@ function Confirm-FccCommandsRemoved {
         }
     }
     if ($remaining.Count -gt 0) {
-        throw "Free Claude Code entry points remain after uv uninstall: $($remaining -join ', '); ~/.fcc was not deleted."
+        throw "Free Claude Code entry points remain after uv uninstall: $($remaining -join ', '); ~/.cwc and ~/.fcc were not deleted."
     }
 }
 
@@ -255,6 +266,8 @@ function Test-FccDesktopShortcutTarget {
 
 function Remove-FccDesktopShortcuts {
     $shortcutPaths = @(
+        (Join-Path $env:USERPROFILE "Desktop\ChatWave Config.lnk"),
+        (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\ChatWave Config.lnk"),
         (Join-Path $env:USERPROFILE "Desktop\Free Claude Code.lnk"),
         (Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Free Claude Code.lnk")
     )
@@ -282,27 +295,27 @@ function Remove-FccDesktopShortcuts {
 }
 
 function Purge-FccHome {
-    $fccHome = Join-Path $env:USERPROFILE $FccHomeDirname
-    if (-not (Test-Path -LiteralPath $fccHome)) {
-        Write-Host "No FCC config directory at $fccHome; skipping purge."
-        return
+    $found = $false
+    foreach ($dirname in @($FccHomeDirname, $LegacyFccHomeDirname)) {
+        $fccHome = Join-Path $env:USERPROFILE $dirname
+        if (-not (Test-Path -LiteralPath $fccHome)) { continue }
+        $found = $true
+        $commandText = @(
+            "Remove-Item",
+            "-LiteralPath",
+            (Format-Argument $fccHome),
+            "-Recurse",
+            "-Force"
+        ) -join " "
+        Write-Host "+ $commandText"
+        if ($DryRun) { continue }
+        Remove-Item -LiteralPath $fccHome -Recurse -Force
+        if (Test-Path -LiteralPath $fccHome) {
+            throw "FCC config directory still exists after deletion: $fccHome"
+        }
     }
-
-    $commandText = @(
-        "Remove-Item",
-        "-LiteralPath",
-        (Format-Argument $fccHome),
-        "-Recurse",
-        "-Force"
-    ) -join " "
-    Write-Host "+ $commandText"
-    if ($DryRun) {
-        return
-    }
-
-    Remove-Item -LiteralPath $fccHome -Recurse -Force
-    if (Test-Path -LiteralPath $fccHome) {
-        throw "FCC config directory still exists after deletion: $fccHome"
+    if (-not $found) {
+        Write-Host "No CWC config directory at $(Join-Path $env:USERPROFILE $FccHomeDirname); skipping purge."
     }
 }
 
@@ -333,7 +346,7 @@ Confirm-FccCommandsRemoved
 Write-Step "Removing Free Claude Code desktop shortcuts"
 Remove-FccDesktopShortcuts
 
-Write-Step "Purging FCC config and data from ~/.fcc"
+Write-Step "Purging ChatWave Config data from ~/.cwc and legacy ~/.fcc"
 Purge-FccHome
 
 Write-Host ""

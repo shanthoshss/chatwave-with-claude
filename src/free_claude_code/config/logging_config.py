@@ -1,7 +1,7 @@
 """Loguru-based structured logging configuration.
 
 Structured logs are written as JSON lines to a configurable path (default
-``~/.fcc/logs/server.log``). Stdlib logging is intercepted and funneled to loguru.
+``~/.cwc/logs/server.log``). Stdlib logging is intercepted and funneled to loguru.
 Loguru's JSON stores exception metadata in ``record.exception`` and context in
 ``record.extra``. Structured traces live in ``record.extra.trace_payload``.
 """

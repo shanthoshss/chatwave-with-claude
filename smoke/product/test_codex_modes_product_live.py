@@ -44,7 +44,7 @@ def _environment(tmp_path: Path, model: str) -> tuple[dict[str, str], set[str]]:
     print(version.stdout.strip())
     atomic_write_managed_config(
         {"ANTHROPIC_AUTH_TOKEN": "codex-mode-smoke", "PROXY_AUTH_ENABLED": "true"},
-        path=tmp_path / "home" / ".fcc" / ".env",
+        path=tmp_path / "home" / ".cwc" / ".env",
     )
     native_home = tmp_path / "codex-home"
     native_home.mkdir()
@@ -557,7 +557,7 @@ def test_codex_child_review_local_e2e(
                 assert marker.read_text().strip() == "smoke"
                 with closing(
                     sqlite3.connect(
-                        (tmp_path / "home" / ".fcc" / FCC_DATABASE_FILENAME).as_uri()
+                        (tmp_path / "home" / ".cwc" / FCC_DATABASE_FILENAME).as_uri()
                         + "?mode=ro",
                         uri=True,
                     )

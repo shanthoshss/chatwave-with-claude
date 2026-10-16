@@ -140,7 +140,7 @@ def test_pi_cli_prompt_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> None:
                 "--project",
                 str(smoke_config.root),
                 "--no-sync",
-                "fcc-pi",
+                "cwc-pi",
                 "--no-session",
                 "--no-approve",
                 "--print",
@@ -170,7 +170,7 @@ def test_opencode_cli_prompt_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> N
     isolated_config = tmp_path / "opencode-config"
     for path in (isolated_home, isolated_config):
         path.mkdir()
-    isolated_fcc = isolated_home / ".fcc"
+    isolated_fcc = isolated_home / ".cwc"
     isolated_fcc.mkdir(mode=0o700)
     shutil.copyfile(managed_env_path(), isolated_fcc / ".env")
     isolated_env = {
@@ -307,7 +307,7 @@ def test_aider_cli_prompt_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> None
                 "--project",
                 str(smoke_config.root),
                 "--no-sync",
-                "fcc-aider",
+                "cwc-aider",
                 "--no-git",
                 "--no-auto-commits",
                 "--no-stream",
@@ -332,7 +332,7 @@ def test_aider_cli_prompt_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> None
     assert "FCC_SMOKE_AIDER" in result.stdout
     assert "POST /v1/messages" in server_log
     assert "POST /v1/responses" not in server_log
-    assert not any((isolated_home / ".fcc" / "tmp" / "aider").iterdir())
+    assert not any((isolated_home / ".cwc" / "tmp" / "aider").iterdir())
 
 
 @pytest.mark.smoke_target("clients")
@@ -376,7 +376,7 @@ def test_cline_cli_prompt_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> None
                 "--project",
                 str(smoke_config.root),
                 "--no-sync",
-                "fcc-cline",
+                "cwc-cline",
                 "--json",
                 "--model",
                 provider_model.full_model,
@@ -482,7 +482,7 @@ def test_hermes_cli_prompt_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> Non
                 "--project",
                 str(smoke_config.root),
                 "--no-sync",
-                "fcc-hermes",
+                "cwc-hermes",
                 "--model",
                 full_model,
                 "-z",
@@ -551,7 +551,7 @@ def test_dsh_cli_headless_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> None
                 "--project",
                 str(smoke_config.root),
                 "--no-sync",
-                "fcc-dsh",
+                "cwc-dsh",
                 "--profile",
                 "headless",
                 f"Reply with exactly {marker}",
@@ -623,7 +623,7 @@ def test_dsh_cli_terminal_failure_e2e(
                 "--project",
                 str(smoke_config.root),
                 "--no-sync",
-                "fcc-dsh",
+                "cwc-dsh",
                 "--profile",
                 "headless",
                 "Reply with exactly FCC_SMOKE_UNREACHABLE",
@@ -703,7 +703,7 @@ def test_dsh_cli_tools_and_resume_e2e(
             "--project",
             str(smoke_config.root),
             "--no-sync",
-            "fcc-dsh",
+            "cwc-dsh",
             "headless",
             "--patch",
             str(patch),
@@ -840,7 +840,7 @@ def test_dsh_cli_web_startup_e2e(
             "--project",
             str(smoke_config.root),
             "--no-sync",
-            "fcc-dsh",
+            "cwc-dsh",
             "web",
             *patches,
             "--no-open",
@@ -1016,7 +1016,7 @@ def test_grok_cli_headless_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> Non
                 "--project",
                 str(smoke_config.root),
                 "--no-sync",
-                "fcc-grok",
+                "cwc-grok",
                 "--model",
                 full_model,
                 "--single",
@@ -1112,7 +1112,7 @@ def test_muse_cli_headless_e2e(smoke_config: SmokeConfig, tmp_path: Path) -> Non
                 "--project",
                 str(smoke_config.root),
                 "--no-sync",
-                "fcc-muse",
+                "cwc-muse",
                 "exec",
                 "--json",
                 "--no-session-log",

@@ -25,7 +25,7 @@ pytestmark = [pytest.mark.live, pytest.mark.smoke_target("clients")]
 def command(config: SmokeConfig) -> list[str]:
     if not shutil.which("dsh") or not (uv := shutil.which("uv")):
         pytest.skip("missing_env: DeepSeek Harness and uv are required")
-    return [uv, "run", "--project", str(config.root), "--no-sync", "fcc-dsh"]
+    return [uv, "run", "--project", str(config.root), "--no-sync", "cwc-dsh"]
 
 
 @pytest.mark.parametrize(

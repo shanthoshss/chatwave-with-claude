@@ -179,7 +179,7 @@ for restricted modes and never set up the sandbox or change your Codex config.
 
 ## Environment
 
-- Runtime settings use the isolated managed `~/.fcc/.env`; `FCC_ENV_FILE` is
+- Runtime settings use the isolated managed `~/.cwc/.env`; `FCC_ENV_FILE` is
   exercised only by the one-time legacy migration smoke.
 - `FCC_LIVE_SMOKE=1`: enables live smoke execution.
 - `FCC_ALLOW_NO_PROVIDER_SMOKE=1`: permits no-provider live smoke for harness work.

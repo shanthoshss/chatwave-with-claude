@@ -272,7 +272,7 @@ def test_field_pattern_extracts_the_issue_form_value() -> None:
 
 ### CLI
 
-Claude Code (fcc-claude)
+Claude Code (cwc-claude)
 """
 
     match = re.search(_workflow_pattern("fieldPattern"), body, flags=re.MULTILINE)

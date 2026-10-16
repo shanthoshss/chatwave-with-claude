@@ -17,7 +17,7 @@ HEADROOM_PACKAGE="headroom-ai[mcp]==0.40.0"
 RTK_RELEASE_BASE_URL="https://github.com/rtk-ai/rtk/releases/download/v$RTK_VERSION"
 UV_INSTALL_URL="https://astral.sh/uv/install.sh"
 # Include retired entry points so updates reject older FCC processes before replacement.
-FCC_COMMANDS="fcc-desktop fcc-server fcc-claude fcc-codex fcc-pi fcc-opencode fcc-cline fcc-hermes fcc-dsh fcc-grok fcc-muse fcc-aider fcc-doctor fcc-update fcc-init free-claude-code"
+FCC_COMMANDS="fcc-desktop fcc-server fcc-claude fcc-codex fcc-pi fcc-opencode fcc-cline fcc-hermes fcc-dsh fcc-grok fcc-muse fcc-aider cwc-claude cwc-codex cwc-pi cwc-opencode cwc-cline cwc-hermes cwc-dsh cwc-grok cwc-muse cwc-aider fcc-doctor fcc-update fcc-init free-claude-code"
 
 dry_run=0
 voice_local=0
@@ -94,8 +94,8 @@ write_install_log() {
 initialize_install_log() {
     [ "$dry_run" -eq 0 ] || return 0
     log_timestamp=$(date '+%Y%m%d-%H%M%S' 2>/dev/null) || log_timestamp=unknown
-    install_log="${HOME:-}/.fcc/logs/install-$log_timestamp-$$.log"
-    if [ -n "${HOME:-}" ] && (umask 077; mkdir -p "$HOME/.fcc/logs" && set -C && : >"$install_log") 2>/dev/null; then
+    install_log="${HOME:-}/.cwc/logs/install-$log_timestamp-$$.log"
+    if [ -n "${HOME:-}" ] && (umask 077; mkdir -p "$HOME/.cwc/logs" && set -C && : >"$install_log") 2>/dev/null; then
         write_install_log "Starting Free Claude Code installer"
     else
         install_log=""
@@ -279,58 +279,58 @@ choose_coding_agents() {
     exec 4>"$selection_output"
 
     while :; do
-        if select_coding_agent claude "Claude Code" fcc-claude; then
+        if select_coding_agent claude "Claude Code" cwc-claude; then
             install_claude=1
         else
             install_claude=0
         fi
-        if select_coding_agent codex Codex fcc-codex; then
+        if select_coding_agent codex Codex cwc-codex; then
             install_codex=1
         else
             install_codex=0
         fi
-        if select_coding_agent pi Pi fcc-pi; then
+        if select_coding_agent pi Pi cwc-pi; then
             install_pi=1
         else
             install_pi=0
         fi
-        if select_coding_agent opencode OpenCode fcc-opencode; then
+        if select_coding_agent opencode OpenCode cwc-opencode; then
             install_opencode=1
         else
             install_opencode=0
         fi
 
-        if select_coding_agent cline "Cline CLI" fcc-cline; then
+        if select_coding_agent cline "Cline CLI" cwc-cline; then
             install_cline=1
         else
             install_cline=0
         fi
 
-        if select_coding_agent hermes "Hermes Agent" fcc-hermes; then
+        if select_coding_agent hermes "Hermes Agent" cwc-hermes; then
             install_hermes=1
         else
             install_hermes=0
         fi
 
-        if select_coding_agent dsh "DeepSeek Harness" fcc-dsh; then
+        if select_coding_agent dsh "DeepSeek Harness" cwc-dsh; then
             install_dsh=1
         else
             install_dsh=0
         fi
 
-        if select_coding_agent grok "Grok Build" fcc-grok; then
+        if select_coding_agent grok "Grok Build" cwc-grok; then
             install_grok=1
         else
             install_grok=0
         fi
 
-        if select_coding_agent muse "Muse Code" fcc-muse; then
+        if select_coding_agent muse "Muse Code" cwc-muse; then
             install_muse=1
         else
             install_muse=0
         fi
 
-        if select_coding_agent aider Aider fcc-aider; then
+        if select_coding_agent aider Aider cwc-aider; then
             install_aider=1
         else
             install_aider=0
@@ -1542,7 +1542,7 @@ configure_and_verify_free_claude_code() {
 
     if [ "$dry_run" -eq 1 ]; then
         print_command uv tool dir --bin
-        printf '+ verify fcc-desktop, fcc-server, fcc-claude, fcc-codex, fcc-pi, fcc-opencode, fcc-cline, fcc-hermes, fcc-dsh, fcc-grok, fcc-muse, and fcc-aider in the uv tool bin directory\n'
+        printf '+ verify fcc-desktop, fcc-server, cwc-claude, cwc-codex, cwc-pi, cwc-opencode, cwc-cline, cwc-hermes, cwc-dsh, cwc-grok, cwc-muse, and cwc-aider in the uv tool bin directory\n'
         print_command fcc-server --version
         return 0
     fi
@@ -1550,7 +1550,7 @@ configure_and_verify_free_claude_code() {
     add_uv_tool_bin_directory
     start_install_step "FCC verification"
 
-    for command_name in fcc-desktop fcc-server fcc-claude fcc-codex fcc-pi fcc-opencode fcc-cline fcc-hermes fcc-dsh fcc-grok fcc-muse fcc-aider fcc-doctor fcc-update; do
+    for command_name in fcc-desktop fcc-server cwc-claude cwc-codex cwc-pi cwc-opencode cwc-cline cwc-hermes cwc-dsh cwc-grok cwc-muse cwc-aider fcc-doctor fcc-update; do
         [ -x "$tool_bin/$command_name" ] || fail "Free Claude Code installation did not create $tool_bin/$command_name."
     done
 
@@ -1574,40 +1574,40 @@ install_macos_desktop_app() {
 
 show_installer_next_steps() {
     if [ "$desktop_ready" -eq 1 ]; then
-        printf '\nFree Claude Code is installed and verified. Open Free Claude Code from Applications or the desktop to run it in the background.\n'
+        printf '\nFree Claude Code is installed and verified. Open ChatWave Config from Applications or the desktop to run it in the background.\n'
         printf 'For terminal use, start the proxy with: fcc-server\n'
     else
         printf '\nFree Claude Code is installed and verified. Start the proxy with: fcc-server\n'
     fi
     if [ "$install_claude" -eq 1 ]; then
-        printf 'Run Claude Code with: fcc-claude\n'
+        printf 'Run Claude Code with: cwc-claude\n'
     fi
     if [ "$install_codex" -eq 1 ]; then
-        printf 'Run Codex with: fcc-codex\n'
+        printf 'Run Codex with: cwc-codex\n'
     fi
     if [ "$pi_available" -eq 1 ]; then
-        printf 'Run Pi with: fcc-pi\n'
+        printf 'Run Pi with: cwc-pi\n'
     fi
     if [ "$install_opencode" -eq 1 ]; then
-        printf 'Run OpenCode with: fcc-opencode\n'
+        printf 'Run OpenCode with: cwc-opencode\n'
     fi
     if [ "$install_cline" -eq 1 ]; then
-        printf 'Run Cline with: fcc-cline\n'
+        printf 'Run Cline with: cwc-cline\n'
     fi
     if [ "$install_hermes" -eq 1 ]; then
-        printf 'Run Hermes Agent with: fcc-hermes\n'
+        printf 'Run Hermes Agent with: cwc-hermes\n'
     fi
     if [ "$install_dsh" -eq 1 ]; then
-        printf 'Run DeepSeek Harness with: fcc-dsh\n'
+        printf 'Run DeepSeek Harness with: cwc-dsh\n'
     fi
     if [ "$install_grok" -eq 1 ]; then
-        printf 'Run Grok Build with: fcc-grok\n'
+        printf 'Run Grok Build with: cwc-grok\n'
     fi
     if [ "$install_muse" -eq 1 ]; then
-        printf 'Run Muse Code with: fcc-muse\n'
+        printf 'Run Muse Code with: cwc-muse\n'
     fi
     if [ "$install_aider" -eq 1 ]; then
-        printf 'Run Aider with: fcc-aider\n'
+        printf 'Run Aider with: cwc-aider\n'
     fi
 }
 

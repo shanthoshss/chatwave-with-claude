@@ -143,7 +143,7 @@ def test_installed_native_app_lifecycle(installed_desktop):
             str(installed["python"]),
             "-c",
             "from pathlib import Path; from free_claude_code.core.interprocess_lock import InterprocessFileLock; "
-            "locks=[InterprocessFileLock(Path.home()/'.fcc'/name) for name in ('desktop.lock','server.owner.lock')]; "
+            "locks=[InterprocessFileLock(Path.home()/'.cwc'/name) for name in ('desktop.lock','server.owner.lock')]; "
             "assert all(lock.acquire() for lock in locks); [lock.release() for lock in locks]",
         ],
         env=installed["env"],
