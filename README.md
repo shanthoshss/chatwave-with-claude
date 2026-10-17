@@ -460,13 +460,13 @@ Windows PowerShell:
 Local Whisper on CPU or CUDA:
 
 ```powershell
-& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main/scripts/install.ps1"))) -VoiceLocal
+& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/shanthoshss/chatwave-with-claude/main/scripts/install.ps1"))) -VoiceLocal
 ```
 
 Local Whisper with CUDA 13.0:
 
 ```powershell
-& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main/scripts/install.ps1"))) -VoiceLocal -TorchBackend cu130
+& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/shanthoshss/chatwave-with-claude/main/scripts/install.ps1"))) -VoiceLocal -TorchBackend cu130
 ```
 
 After installing local support, restart `fcc-server`. In **Admin UI → Messaging → Voice**, enable voice notes, select `cpu` or `cuda`, and choose the Whisper model. Local gated models need `HUGGINGFACE_API_KEY`.
@@ -482,7 +482,7 @@ Run `fcc-server --version` to check the installed version without starting FCC.
 Stop all running FCC commands, then run:
 
 ```sh
-fcc-update
+cwc-update
 ```
 
 The update installs the checked stable FCC release with its matching installer.
@@ -496,13 +496,13 @@ For local voice support, include `--voice-local` (macOS/Linux) or `-VoiceLocal` 
 To install or update only Muse Code:
 
 ```powershell
-& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main/scripts/install-muse.ps1")))
+& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/shanthoshss/chatwave-with-claude/main/scripts/install-muse.ps1")))
 ```
 
 To remove the Muse Code copy installed by FCC, keeping its data:
 
 ```powershell
-& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main/scripts/uninstall-muse.ps1")))
+& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/shanthoshss/chatwave-with-claude/main/scripts/uninstall-muse.ps1")))
 ```
 
 Uninstalling FCC leaves Muse Code installed.
@@ -530,7 +530,7 @@ curl -fsSL "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main
 Windows PowerShell:
 
 ```powershell
-& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/Alishahryar1/free-claude-code/main/scripts/uninstall.ps1")))
+& ([scriptblock]::Create((irm "https://raw.githubusercontent.com/shanthoshss/chatwave-with-claude/main/scripts/uninstall.ps1")))
 ```
 
 ## Project Links
