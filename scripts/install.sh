@@ -460,6 +460,19 @@ add_uv_tool_bin_directory() {
     hash -r 2>/dev/null || true
 }
 
+ensure_cwc_launcher_compatibility() {
+    for agent in claude codex pi opencode cline hermes dsh grok muse aider; do
+        cwc_command="$tool_bin/cwc-$agent"
+        fcc_command="$tool_bin/fcc-$agent"
+        if [ -x "$cwc_command" ] || [ -e "$cwc_command" ] || [ -L "$cwc_command" ]; then
+            continue
+        fi
+        if [ -x "$fcc_command" ]; then
+            ln -s "$fcc_command" "$cwc_command"
+        fi
+    done
+}
+
 add_npm_bin_directories() {
     [ "$dry_run" -eq 0 ] || return 0
     add_known_bin_directories
@@ -1548,6 +1561,7 @@ configure_and_verify_free_claude_code() {
     fi
 
     add_uv_tool_bin_directory
+    ensure_cwc_launcher_compatibility
     start_install_step "FCC verification"
 
     for command_name in fcc-desktop fcc-server cwc-claude cwc-codex cwc-pi cwc-opencode cwc-cline cwc-hermes cwc-dsh cwc-grok cwc-muse cwc-aider fcc-doctor fcc-update; do

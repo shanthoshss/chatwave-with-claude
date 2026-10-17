@@ -185,6 +185,16 @@ uninstall_free_claude_code() {
     fail "uv tool uninstall $PACKAGE_NAME failed with exit code $status; ~/.cwc and ~/.fcc were not deleted."
 }
 
+remove_cwc_compatibility_aliases() {
+    for agent in claude codex pi opencode cline hermes dsh grok muse aider; do
+        cwc_command="$uv_tool_bin/cwc-$agent"
+        fcc_command="$uv_tool_bin/fcc-$agent"
+        if [ -L "$cwc_command" ] && [ "$(readlink "$cwc_command")" = "$fcc_command" ]; then
+            run rm -f "$cwc_command"
+        fi
+    done
+}
+
 verify_fcc_commands_removed() {
     if [ "$dry_run" -eq 1 ]; then
         printf '+ verify all Free Claude Code entry points are absent from the uv tool bin directory\n'
@@ -291,6 +301,9 @@ initialize_uv_context
 
 step "Removing the Free Claude Code uv tool"
 uninstall_free_claude_code
+
+step "Removing temporary ChatWave Config compatibility launchers"
+remove_cwc_compatibility_aliases
 
 step "Verifying Free Claude Code entry points were removed"
 verify_fcc_commands_removed

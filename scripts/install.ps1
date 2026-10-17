@@ -445,6 +445,45 @@ function Get-ApplicationCommand {
     return $commands[0]
 }
 
+function Ensure-CwcLauncherCompatibility {
+    param([string] $ToolBin)
+
+    $marker = "@rem ChatWave Config compatibility launcher"
+    foreach ($launcher in @("cwc-claude", "cwc-codex", "cwc-pi", "cwc-opencode", "cwc-cline", "cwc-hermes", "cwc-dsh", "cwc-grok", "cwc-muse", "cwc-aider")) {
+        $nativeCommand = $false
+        foreach ($extension in @(".exe", ".cmd", ".bat", ".ps1", "")) {
+            $candidate = Join-Path $ToolBin "$launcher$extension"
+            if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) { continue }
+            if ($extension -eq ".cmd") {
+                $firstLine = Get-Content -LiteralPath $candidate -TotalCount 1 -ErrorAction SilentlyContinue
+                if ($firstLine -eq $marker) { continue }
+            }
+            $nativeCommand = $true
+            break
+        }
+        if ($nativeCommand) { continue }
+
+        $legacyLauncher = $launcher.Replace("cwc-", "fcc-")
+        $legacyTarget = $null
+        foreach ($extension in @(".exe", ".cmd", ".bat", ".ps1", "")) {
+            $candidate = Join-Path $ToolBin "$legacyLauncher$extension"
+            if (Test-Path -LiteralPath $candidate -PathType Leaf) {
+                $legacyTarget = [IO.Path]::GetFileName($candidate)
+                break
+            }
+        }
+        if (-not $legacyTarget) { continue }
+
+        $shimPath = Join-Path $ToolBin "$launcher.cmd"
+        if (Test-Path -LiteralPath $shimPath -PathType Leaf) {
+            $firstLine = Get-Content -LiteralPath $shimPath -TotalCount 1 -ErrorAction SilentlyContinue
+            if ($firstLine -ne $marker) { continue }
+        }
+        $shim = "$marker`r`n@call `"%~dp0$legacyTarget`" %*`r`n@exit /b %ERRORLEVEL%`r`n"
+        [IO.File]::WriteAllText($shimPath, $shim, [Text.Encoding]::ASCII)
+    }
+}
+
 function Get-PowerShellExecutable {
     param([string] $PowerShellHome = $PSHOME)
 
@@ -1763,6 +1802,7 @@ function Configure-AndConfirmFreeClaudeCode {
     }
     Invoke-NativeCommand -FilePath $uvCommand.Source -Arguments @("tool", "update-shell")
     $toolBin = Add-UvToolBinDirectory -UvPath $uvCommand.Source
+    Ensure-CwcLauncherCompatibility -ToolBin $toolBin
     Start-InstallStep "FCC verification"
     $toolBinPath = ([IO.Path]::GetFullPath($toolBin)).TrimEnd(
         [IO.Path]::DirectorySeparatorChar,

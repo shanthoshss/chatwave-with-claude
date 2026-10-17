@@ -210,6 +210,20 @@ function Uninstall-FreeClaudeCode {
     throw "uv tool uninstall $PackageName failed with exit code $($result.ExitCode); ~/.cwc and ~/.fcc were not deleted."
 }
 
+function Remove-CwcCompatibilityLaunchers {
+    $marker = "@rem ChatWave Config compatibility launcher"
+    foreach ($commandName in @("cwc-claude", "cwc-codex", "cwc-pi", "cwc-opencode", "cwc-cline", "cwc-hermes", "cwc-dsh", "cwc-grok", "cwc-muse", "cwc-aider")) {
+        $commandPath = Join-Path $script:UvToolBin "$commandName.cmd"
+        if (-not (Test-Path -LiteralPath $commandPath -PathType Leaf)) { continue }
+        $firstLine = Get-Content -LiteralPath $commandPath -TotalCount 1 -ErrorAction SilentlyContinue
+        if ($firstLine -ne $marker) { continue }
+        Write-Host "+ Remove-Item -LiteralPath $(Format-Argument $commandPath) -Force"
+        if (-not $DryRun) {
+            Remove-Item -LiteralPath $commandPath -Force
+        }
+    }
+}
+
 function Confirm-FccCommandsRemoved {
     if ($DryRun) {
         Write-Host "+ verify all Free Claude Code entry points are absent from the uv tool bin directory"
@@ -339,6 +353,9 @@ Initialize-UvContext
 
 Write-Step "Removing the Free Claude Code uv tool"
 Uninstall-FreeClaudeCode
+
+Write-Step "Removing temporary ChatWave Config compatibility launchers"
+Remove-CwcCompatibilityLaunchers
 
 Write-Step "Verifying Free Claude Code entry points were removed"
 Confirm-FccCommandsRemoved

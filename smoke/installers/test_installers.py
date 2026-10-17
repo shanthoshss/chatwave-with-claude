@@ -430,9 +430,11 @@ if [ "${{1:-}}" = "tool" ] && [ "${{2:-}}" = "install" ]; then
     cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/fcc-grok"
     cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/fcc-muse"
     cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/fcc-aider"
-    for command_name in cwc-claude cwc-codex cwc-pi cwc-opencode cwc-cline cwc-hermes cwc-dsh cwc-grok cwc-muse cwc-aider; do
-        cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/$command_name"
-    done
+    if [ "$FAIL_STEP" != "cwc-missing" ]; then
+        for command_name in cwc-claude cwc-codex cwc-pi cwc-opencode cwc-cline cwc-hermes cwc-dsh cwc-grok cwc-muse cwc-aider; do
+            cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/$command_name"
+        done
+    fi
     cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/fcc-doctor"
     cp "$FAKE_FIXTURES/fcc-command.sh" "$tool_bin/fcc-update"
     if [ "$FAIL_STEP" != "fcc-missing" ]; then
@@ -1101,6 +1103,27 @@ def test_install_sh_fresh_install_is_verified(posix_harness: PosixHarness) -> No
         )
         for call in calls
     )
+
+
+def test_install_sh_bridges_legacy_package_launchers(posix_harness: PosixHarness) -> None:
+    result = posix_harness.run(fail_step="cwc-missing")
+
+    assert result.returncode == 0, result.stderr
+    for agent in (
+        "claude",
+        "codex",
+        "pi",
+        "opencode",
+        "cline",
+        "hermes",
+        "dsh",
+        "grok",
+        "muse",
+        "aider",
+    ):
+        alias = posix_harness.tool_bin / f"cwc-{agent}"
+        assert alias.is_symlink()
+        assert alias.resolve() == (posix_harness.tool_bin / f"fcc-{agent}").resolve()
     assert not any(call.startswith("git:") for call in calls)
     assert calls[-3:] == [
         "uv:tool update-shell",
@@ -2334,7 +2357,9 @@ copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-dsh.cmd" >nul
 copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-grok.cmd" >nul
 copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-muse.cmd" >nul
 copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-aider.cmd" >nul
+if "%FAIL_STEP%"=="cwc-missing" goto skip_cwc_commands
 for %%C in (cwc-claude cwc-codex cwc-pi cwc-opencode cwc-cline cwc-hermes cwc-dsh cwc-grok cwc-muse cwc-aider) do copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\%%C.cmd" >nul
+:skip_cwc_commands
 copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-doctor.cmd" >nul
 copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-update.cmd" >nul
 if not "%FAIL_STEP%"=="fcc-missing" copy /y "%FAKE_FIXTURES%\fcc-command.cmd" "%UV_BIN_DIR%\fcc-codex.cmd" >nul
@@ -3430,6 +3455,31 @@ def test_install_ps1_fresh_install_is_verified(
         "uv:tool dir --bin",
         "fcc-server:--version",
     ]
+
+
+def test_install_ps1_bridges_legacy_package_launchers(
+    powershell_harness: PowerShellHarness,
+) -> None:
+    result = powershell_harness.run(fail_step="cwc-missing")
+
+    assert result.returncode == 0, result.stderr
+    for agent in (
+        "claude",
+        "codex",
+        "pi",
+        "opencode",
+        "cline",
+        "hermes",
+        "dsh",
+        "grok",
+        "muse",
+        "aider",
+    ):
+        alias = powershell_harness.tool_bin / f"cwc-{agent}.cmd"
+        assert alias.is_file()
+        assert alias.read_text(encoding="ascii").startswith(
+            "@rem ChatWave Config compatibility launcher\n"
+        )
     home = Path(powershell_harness.env["USERPROFILE"])
     app_data = Path(powershell_harness.env["APPDATA"])
     assert (home / ".grok" / "bin" / "grok.cmd").is_file()
